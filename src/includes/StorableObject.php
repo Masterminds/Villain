@@ -34,7 +34,7 @@
  * a magic __call() function which handles setter/getter calls.
  * 
  */
-class StorableObject {
+class StorableObject implements Storable {
   
   protected $storage = array();
   
@@ -77,18 +77,36 @@ class StorableObject {
     throw new Exception('Unknown method called: ' . $name);
   }
   
+  /**
+   * Guaranteed function to do primordial get operations.
+   *
+   * With this model, we need an ensured way to allow subclasses to
+   * set the actual value without being intercepted by another function.
+   *
+   * This should be used with care, as misuse can violate assumptions
+   * about the data, and thus compromise data integrity.
+   */
+  protected final function primordialGet($name) {
+    return $this->storage[$name];
+  }
+  /**
+   * Guaranteed function to do primordial set operations.
+   *
+   * With this model, we need an ensured way to allow subclasses to
+   * set the actual value without being intercepted by another function.
+   *
+   * This should be used with care, as misuse can violate assumptions
+   * about the data, and thus compromise data integrity.
+   */
+  protected final function primordialSet($name, $value) {
+    $this->storage[$name] = $value;
+  }
+  
   public function toArray() {
     return $this->storage;
   }
   
-  /**
-   * Re-initialize a storage object with the given data.
-   *
-   * Note that this bypasses any data checks. The assumption is that
-   * the data passed in is already valid data.
-   *
-   *
-   */
+  
   public function fromArray(array $data) {
     $this->storage = $data;
   }
