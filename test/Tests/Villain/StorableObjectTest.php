@@ -121,39 +121,3 @@ class StorableObjectTestExtension extends StorableObject {
   
 }
 
-class StorableObjectTestDecorator extends StorableObject {
-  
-  protected $inner = NULL;
-  
-  public function __construct(StorableObject $o) {
-    $this->inner = $o;
-  }
-  
-  public function __set($name, $value) {
-    $this->inner->$name = $value;
-  }
-  
-  public function __get($name) {
-    return $this->inner->$name;
-  }
-  
-  public function __isset($name) {
-    return isset($this->inner->$name);
-  }
-  
-  public function __call($name, $args) {
-    return $this->inner->$name($args);
-  }
-  
-  public function toArray() {
-    return $this->inner->toArray();
-  }
-  
-  public function fromArray(array $array) {
-    return $this->inner->fromArray();
-  }
-  
-  public function setOverride($foo) {
-    $this->inner->override = __CLASS__ . '-' . $foo;
-  }
-}
