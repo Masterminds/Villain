@@ -53,3 +53,14 @@ class StorableObjectDecorator implements Storable {
   public function fromArray(array $array) {
     return $this->inner->fromArray();
   }
+  
+  /**
+   * Get the wrapped object.
+   *
+   * @return StorableObject
+   *  The storable object that this decorator wraps.
+   */
+  final public function unwrap() {
+    return $this->o;
+  }
+}
