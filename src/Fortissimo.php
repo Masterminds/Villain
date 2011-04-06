@@ -388,7 +388,8 @@ class Fortissimo {
    * caching. When request caching is enabled, the output of a request is 
    * stored in a cache. Subsequent identical requests will be served out of
    * the cache, thereby avoiding all overhead associated with loading and 
-   * executing commands.
+   * executing commands. (Request caching is different than command caching, see Cacheable, which
+   * caches only the output of individual commands.)
    *
    * @param string $identifier
    *  A named identifier, typically a URI. By default (assuming ForitissimoRequestMapper has not 
@@ -441,6 +442,8 @@ class Fortissimo {
         return;
       }
       
+      // If we get here, no cache hit was found, so we start buffering the
+      // content to cache it.
       $this->startCaching();
     }
     
@@ -577,6 +580,13 @@ class Fortissimo {
   /**
    * Execute a single command.
    *
+   * This takes a command array, which describes a command, and then does the following:
+   * 
+   * - Find out what params the command expects and get them.
+   * - Prepare any event handlers that listen for events on this command
+   * - Execute the command
+   * - Handle any errors that arise
+   *
    * @param array $commandArray
    *  An associative array, as described in FortissimoConfig::createCommandInstance.
    * @throws FortissimoException
@@ -614,6 +624,13 @@ class Fortissimo {
   
   /**
    * Retrieve the parameters for a command.
+   *
+   * This does the following:
+   *
+   * - Find out what parameters a command expects.
+   * - Look at the Config::from() calls on an object and retrieve data as necessary. This uses fetchParameterFromSource() to retrieve the data.
+   * - Fill in default values from Config::whoseValueIs() calls
+   * - Return the mapping of parameter names to (newly fetched) values.
    *
    * @param array $commandArray
    *  Associative array of information about a command, as described
@@ -1265,6 +1282,14 @@ interface Observable {
  * For example, BaseFortissimoCommand is capable of understanding Cacheable objects. When 
  * a BaseFortissimCommand::doCommand() result is returned, if a cache key can be generated
  * for it, then its results will be cached.
+ *
+ * To implement and configure caching:
+ * - Make your BaseFortissimoCommand class implement Cacheable
+ * - Set up a cache with Config::cache()
+ *
+ * When the command is executed, its results will be stored in cache. The next time the command
+ * is executed, it will first attempt to use the cached copy (unless that copy is gone or
+ * expired). If a copy is found, it is returned, otherwise a new copy is generated.
  */
 interface Cacheable {
   
@@ -1312,6 +1337,32 @@ interface Cacheable {
    *  The name of the cache. If this is NULL, then the default cache will be used.
    */
   public function cacheBackend();
+  
+  
+  /**
+   * Indicate whether or not the current command is caching.
+   *
+   * This provides a standard mechanism for indicating whether or not a particular
+   * Cacheable instance is allowed to be cached. Implementors can, for example, 
+   * implement a configuration parameter that will enable or disable caching.
+   *
+   * Typically, when the request handing subsystem test an object to see if it is
+   * able to be cached, the following should all be true:
+   *
+   * - Fortissimo ought to have a suitable cache provided (e.g. Config::cache())
+   * - The command should implement Cacheable
+   * - isCaching() should return TRUE
+   * - cacheKey() should return a string value
+   *
+   * Note that this flag is checked after the command is initialized, but before the 
+   * command is executed. Any changes that the command makes to this value during
+   * the command's execution will be ignored.
+   *
+   * @return boolean
+   *  TRUE if this command is in caching mode, FALSE if this command object is 
+   *  disallowing cached output.
+   */
+  public function isCaching();
 }
 
 /**
@@ -1390,11 +1441,22 @@ abstract class BaseFortissimoCommand implements FortissimoCommand, Explainable, 
   /**
    * By default, a Fortissimo base command is cacheable.
    *
+   * This has been deprecated in favor of the Cacheable interface. To test the 
+   * cacheability of an object, you should run this:
+   * @code
+   * <?php
+   * $cmd instanceof Cacheable;
+   * ?>
+   * @endcode
+   *
    * @return boolean
    *  Returns TRUE unless a subclass overrides this.
+   * @deprecated
+   *  This is no longer used, as it was replaced by the Cacheable interface.
    */
   public function isCacheable() {
-    return TRUE;
+    //return TRUE;
+    return $this instanceof Cacheable;
   }
   
   /**
@@ -1499,7 +1561,7 @@ abstract class BaseFortissimoCommand implements FortissimoCommand, Explainable, 
     $result = NULL;
     
     // If this looks like a cache can handle it, use a cache.
-    if ($this instanceof Cacheable && ($key = $this->cacheKey()) != NULL) {
+    if ($this instanceof Cacheable && $this->isCaching() && ($key = $this->cacheKey()) != NULL) {
       $result = $this->executeWithCache($key);
     }
     
@@ -1976,12 +2038,12 @@ class FortissimoConfig {
    * Get all caches.
    *
    * This will load all of the caches from the command configuration 
-   * (typically commands.xml) and return them in an associative array of 
+   * (typically commands.php) and return them in an associative array of 
    * the form array('name' => object), where object is a FortissimoRequestCache
    * of some sort.
    * 
    * @return array
-   *  An associative array of name => logger pairs.
+   *  An associative array of name => cache pairs.
    * @see FortissimoRequestCache
    */
   public function getCaches() {
@@ -2008,7 +2070,7 @@ class FortissimoConfig {
     foreach ($this->config[$type] as $name => $facility) {
       $klass = $facility['class'];
       $params = isset($facility['params']) ? $this->getParams($facility['params']) : array();
-      $facilities[$name] = new $klass($params);
+      $facilities[$name] = new $klass($params, $name);
     }
     return $facilities;
   }
@@ -2106,7 +2168,7 @@ class FortissimoConfig {
   protected function createCommandInstance($cmd, $config) {
     $class = $config['class'];
     if (empty($class)) {
-      throw new FortissimoConfigException('No class specified for ' . $cmd);
+      throw new FortissimoConfigurationException('No class specified for ' . $cmd);
     }
 
     $cache = isset($config['caching']) && filter_var($config['caching'], FILTER_VALIDATE_BOOLEAN);
@@ -2468,6 +2530,20 @@ class FortissimoCacheManager {
   }
   
   /**
+   * Get an array of cache names.
+   *
+   * This will generate a list of names for all of the caches
+   * that are currently active. This name can be passed to getCacheByName() 
+   * to get a particular cache.
+   *
+   * @return array
+   *  An indexed array of cache names.
+   */
+  public function getCacheNames() {
+    return array_keys($this->caches);
+  }
+  
+  /**
    * Get the default cache.
    */
   public function getDefaultCache() {
@@ -2785,13 +2861,24 @@ abstract class FortissimoCache {
    */
   protected $params = NULL;
   protected $default = FALSE;
+  protected $name = NULL;
   
   /**
    * Construct a new datasource.
+   *
+   * @param array $params
+   *  The parameters passed in from the configuration.
+   * @param string $name
+   *  The name of the facility.
    */
-  public function __construct($params = array()) {
+  public function __construct($params = array(), $name = 'unknown_cache') {
     $this->params = $params;
+    $this->name = $name;
     $this->default = isset($params['isDefault']) && filter_var($params['isDefault'], FILTER_VALIDATE_BOOLEAN);
+  }
+  
+  public function getName() {
+    return $this->name;
   }
   
   /**
@@ -2936,13 +3023,30 @@ abstract class FortissimoDatasource {
    */
   protected $params = NULL;
   protected $default = FALSE;
+  protected $name = NULL;
   
   /**
    * Construct a new datasource.
+   *
+   * @param array $params
+   *  An associative array of params from the configuration.
+   * @param string $name
+   *  The name of the facility.
    */
-  public function __construct($params = array()) {
+  public function __construct($params = array(), $name = 'unknown_datasource') {
     $this->params = $params;
+    $this->name = $name;
     $this->default = isset($params['isDefault']) && filter_var($params['isDefault'], FILTER_VALIDATE_BOOLEAN);
+  }
+  
+  /**
+   * Get this datasource's name, as set in the configuration.
+   *
+   * @return string
+   *  The name of this datasource.
+   */
+  public function getName() {
+    return $this->name;
   }
   
   /**
@@ -2998,15 +3102,19 @@ abstract class FortissimoLogger {
    */
   protected $params = NULL;
   protected $facilities = NULL;
+  protected $name = NULL;
   
   /**
    * Construct a new logger instance.
    *
    * @param array $params
    *   An associative array of name/value pairs.
+   * @param string $name
+   *   The name of this logger.
    */
-  public function __construct($params = array()) {
+  public function __construct($params = array(), $name = 'unknown_logger') {
     $this->params = $params;
+    $this->name = $name;
     
     // Add support for facility declarations.
     if (isset($params['categories'])) {
@@ -3018,6 +3126,16 @@ abstract class FortissimoLogger {
       $this->facilities = array_combine($fac, $fac);
     }
     
+  }
+  
+  /**
+   * Get the name of this logger.
+   *
+   * @return string
+   *  The name of this logger.
+   */
+  public function getName() {
+    return $this->name;
   }
   
   /**
@@ -3664,13 +3782,50 @@ class Config {
     return $this;
   }
   /**
-   * Turn on or off caching for a request.
+   * Turn on or off caching for a request or command.
+   *
+   * Command-based caching caches the results of just a specific command. It makes it 
+   * possible to have certain parts of a request be cached while not caching the entire
+   * request.
+   *
+   * @code
+   * <?php
+   * Config::request('foo')
+   *   ->doesCommand('bar')
+   *   ->whichInvokes('MyBarClass')
+   *   ->whichUses('baz')->whoseValueIs('lurp')
+   *   ->isCaching(TRUE);
+   * ?>
+   *   
+   * Request-based caching (EXPERIMENTAL) caches the output of an entire request.
+   *
+   * @code
+   * <?php
+   * Config::request('foo')->isCaching(TRUE);
+   * ?>
+   * @endcode
+   *
+   * @param boolean $boolean
+   *  TRUE to turn on caching, FALSE to disable caching.
    */
   public function isCaching($boolean = TRUE) {
     if ($this->currentCategory == self::REQUESTS) {
       $cat = $this->currentCategory;
       $name = $this->currentName;
       $this->config[$cat][$name]['#caching'] = $boolean;
+/*      
+      if (!empty($this->commandName)) {
+        $this->config[$cat][$name][$this->commandName]['cache'] = $boolean;
+      }
+      else {
+        $this->config[$cat][$name]['#caching'] = $boolean;
+      }
+      
+    }
+    // Add caching in group commands.
+    elseif ($this->currentCategory == self::GROUPS && !empty($this->commandName)) {
+      $this->config[$cat][$name][$this->commandName]['cache'] = $boolean;
+*/
     }
     return $this;
     
