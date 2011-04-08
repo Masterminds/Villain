@@ -297,15 +297,31 @@ class Fortissimo {
     $paths = $this->commandConfig->getIncludePaths();
     $this->addIncludePaths($paths);
     
+    /*
+     * Create log, cache, and datasource managers, then give each a handle to the others.
+     */
+    
     // Create the log manager.
     $this->logManager = new FortissimoLoggerManager($this->commandConfig->getLoggers());
-    
-    // Create cache manager.
-    $this->cacheManager = new FortissimoCacheManager($this->commandConfig->getCaches());
     
     // Create the datasource manager.
     $this->datasourceManager = new FortissimoDatasourceManager($this->commandConfig->getDatasources());
     
+    // Create cache manager.
+    $this->cacheManager = new FortissimoCacheManager($this->commandConfig->getCaches());
+
+    // Set up the log manager
+    $this->logManager->setDatasourceManager($this->datasourceManager);
+    $this->logManager->setCacheManager($this->cacheManager);
+    
+    // Set up the datasource manager
+    $this->datasourceManager->setLogManager($this->logManager);
+    $this->datasourceManager->setCacheManager($this->cacheManager);
+    
+    // Set up the cache manager
+    $this->cacheManager->setLogManager($this->logManager);
+    $this->cacheManager->setDatasourceManager($this->datasourceManager);
+
     // Create a request mapper. We do this last so that it can access the other facilities.
     $mapperClass = $this->commandConfig->getRequestMapper();
     if (!is_string($mapperClass) && !is_object($mapperClass)) {
@@ -399,8 +415,16 @@ class Fortissimo {
    *  been overridden) the $identifier should be a request name.
    * @param FortissimoExecutionContext $initialCxt
    *  If an initialized context is necessary, it can be passed in here.
+   * @param boolean $allowInternalRequests
+   *  When this is TRUE, requests that are internal-only are allowed. Generally, this is TRUE under
+   *  the following circumstances:
+   *  - When a FortissimoRedirect is thrown, internal requests are allowed. This is so that
+   *    you can declare internal requests that assume that certain tasks have already been 
+   *    performed.
+   *  - Some clients can explicitly call handleRequest() with this flag set to TRUE. One example
+   *    is `fort`, which will allow command-line execution of internal requests.
    */
-  public function handleRequest($identifier = 'default', FortissimoExecutionContext $initialCxt = NULL) {
+  public function handleRequest($identifier = 'default', FortissimoExecutionContext $initialCxt = NULL, $allowInternalRequests = FALSE) {
     
     // Experimental: Convert errors (E_ERROR | E_USER_ERROR) to exceptions.
     set_error_handler(array('FortissimoErrorException', 'initializeFromError'), 257);
@@ -409,15 +433,15 @@ class Fortissimo {
     try {
       // Use the mapper to determine what the real request name is.
       $requestName = $this->requestMapper->uriToRequest($identifier);
-      $request = $this->commandConfig->getRequest($requestName);
+      $request = $this->commandConfig->getRequest($requestName, $allowInternalRequests);
     }
     catch (FortissimoRequestNotFoundException $nfe) {
       // Need to handle this case.
       $this->logManager->log($nfe, self::LOG_USER);
       $requestName = $this->requestMapper->uriToRequest('404');
       
-      if ($this->commandConfig->hasRequest($requestName)) {
-        $request = $this->commandConfig->getRequest($requestName);
+      if ($this->commandConfig->hasRequest($requestName, $allowInternalRequests)) {
+        $request = $this->commandConfig->getRequest($requestName, $allowInternalRequests);
       }
       else {
         header('HTTP/1.0 404 Not Found');
@@ -482,8 +506,9 @@ class Fortissimo {
         // For now we just stop caching.
         $this->stopCaching();
         
-        // Forward the request to another handler.
-        $this->handleRequest($forward->destination(), $forward->context());
+        // Forward the request to another handler. Note that we allow forwarding
+        // to internal requests.
+        $this->handleRequest($forward->destination(), $forward->context(), TRUE);
         return;
       }
       // Kill the request, no error.
@@ -2007,11 +2032,16 @@ class FortissimoConfig {
   /**
    * Check whether the named request is known to the system.
    *
+   * @param string $requestName
+   *  The name of the request to check.
+   * @param boolean $allowInternalRequests
+   *  If this is TRUE, this will allow internal request names. Otherwise, it will flag internal
+   *  requests as having illegal names.
    * @return boolean
    *  TRUE if this is a known request, false otherwise.
    */
-  public function hasRequest($requestName){
-    if (!self::isLegalRequestName($requestName))  {
+  public function hasRequest($requestName, $allowInternalRequests = FALSE){
+    if (!self::isLegalRequestName($requestName, $allowInternalRequests))  {
       throw new FortissimoException('Illegal request name.');
     }
     return isset($this->config[Config::REQUESTS][$requestName]);
@@ -2026,11 +2056,15 @@ class FortissimoConfig {
    * @param string $requestName
    *  The name of the request. This value will be validated according to the rules
    *  explained above.
+   * @param boolean $allowInternalRequests
+   *  If this is set to TRUE, the checking will be relaxed to allow at-requests.
    * @return boolean
    *  TRUE if the name is legal, FALSE otherwise.
    */
-  public static function isLegalRequestName($requestName) {
-    return preg_match('/^[_a-zA-Z0-9\\-]+$/', $requestName) == 1;
+  public static function isLegalRequestName($requestName, $allowInternalRequests = FALSE) {
+    $regex = $allowInternalRequests ? '/^@?[_a-zA-Z0-9\\-]+$/' : '/^[_a-zA-Z0-9\\-]+$/';
+    
+    return preg_match($regex, $requestName) == 1;
   }
   
   /**
@@ -2120,17 +2154,21 @@ class FortissimoConfig {
    *
    * @param string $requestName
    *  The name of the request
+   * @param boolean $allowInternalRequests
+   *  If this is true, internal requests (@-requests, at-requests) will be allowed.
    * @return FortissimoRequest 
    *  A queue of commands that need to be executed. See {@link createCommandInstance()}.
    * @throws FortissimoRequestNotFoundException
    *  If no such request is found, or if the request is malformed, and exception is 
    *  thrown. This exception should be considered fatal, and a 404 error should be 
-   *  returned.
+   *  returned. Note that (provisionally) a FortissimoRequestNotFoundException is also thrown if
+   *  $allowInternalRequests if FALSE and the request name is for an internal request. This is 
+   *  basically done to prevent information leakage.
    */
-  public function getRequest($requestName) {
+  public function getRequest($requestName, $allowInternalRequests = FALSE) {
     
     // Protection against attempts at request hacking.
-    if (!self::isLegalRequestName($requestName))  {
+    if (!self::isLegalRequestName($requestName, $allowInternalRequests))  {
       throw new FortissimoRequestNotFoundException('Illegal request name.');
     }
     
@@ -2537,6 +2575,14 @@ class FortissimoCacheManager {
     $this->caches = $caches;
   }
   
+  public function setLogManager($manager) {
+    foreach ($this->caches as $name => $obj) $obj->setLogManager($manager);
+  }
+  
+  public function setDatasourceManager($manager) {
+    foreach ($this->caches as $name => $obj) $obj->setDatasourceManager($manager);
+  }
+  
   /**
    * Given a name, retrieve the cache.
    *
@@ -2687,6 +2733,7 @@ class FortissimoDatasourceManager {
   
   protected $datasources = NULL;
   protected $initMap = array();
+
   
   /**
    * Build a new datasource manager.
@@ -2698,6 +2745,15 @@ class FortissimoDatasourceManager {
   public function __construct($config) {
     $this->datasources = &$config;
   }
+  
+  public function setCacheManager(FortissimoCacheManager $manager) {
+    foreach ($this->datasources as $name => $obj) $obj->setCacheManager($manager);
+  }
+  
+  public function setLogManager(FortissimoLoggerManager $manager) {
+    foreach ($this->datasources as $name => $obj) $obj->setLogManager($manager);
+  }
+  
   
   /**
    * Get a datasource by its string name.
@@ -2811,6 +2867,15 @@ class FortissimoLoggerManager {
     $this->loggers = &$config;
   }
   
+  public function setCacheManager(FortissimoCacheManager $manager) {
+    foreach ($this->loggers as $name => $obj) $obj->setCacheManager($manager);
+  }
+  
+  public function setDatasourceManager(FortissimoDatasourceManager $manager) {
+    foreach ($this->loggers as $name => $obj) $obj->setDatasourceManager($manager);
+  }
+  
+  
   /**
    * Get a logger.
    *
@@ -2881,6 +2946,8 @@ abstract class FortissimoCache {
   protected $params = NULL;
   protected $default = FALSE;
   protected $name = NULL;
+  protected $datasourceManager = NULL;
+  protected $logManager = NULL;
   
   /**
    * Construct a new datasource.
@@ -2894,6 +2961,14 @@ abstract class FortissimoCache {
     $this->params = $params;
     $this->name = $name;
     $this->default = isset($params['isDefault']) && filter_var($params['isDefault'], FILTER_VALIDATE_BOOLEAN);
+  }
+  
+  public function setDatasourceManager(FortissimoDatasourceManager $manager) {
+    $this->datasourceManager = $manager;
+  }
+  
+  public function setLogManager(FortissimoLoggerManager $manager) {
+    $this->logManager = $manager;
   }
   
   public function getName() {
@@ -3043,6 +3118,8 @@ abstract class FortissimoDatasource {
   protected $params = NULL;
   protected $default = FALSE;
   protected $name = NULL;
+  protected $logManager = NULL;
+  protected $cacheManager = NULL;
   
   /**
    * Construct a new datasource.
@@ -3056,6 +3133,14 @@ abstract class FortissimoDatasource {
     $this->params = $params;
     $this->name = $name;
     $this->default = isset($params['isDefault']) && filter_var($params['isDefault'], FILTER_VALIDATE_BOOLEAN);
+  }
+  
+  public function setCacheManager(FortissimoCacheManager $manager) {
+    $this->cacheManager = $manager;
+  }
+  
+  public function setLogManager(FortissimoLoggerManager $manager) {
+    $this->logManager = $manager;
   }
   
   /**
@@ -3122,6 +3207,8 @@ abstract class FortissimoLogger {
   protected $params = NULL;
   protected $facilities = NULL;
   protected $name = NULL;
+  protected $datasourceManager = NULL;
+  protected $cacheManager = NULL;
   
   /**
    * Construct a new logger instance.
@@ -3146,6 +3233,15 @@ abstract class FortissimoLogger {
     }
     
   }
+  
+  public function setDatasourceManager(FortissimoDatasourceManager $manager) {
+    $this->datasourceManager = $manager;
+  }
+  
+  public function setCacheManager(FortissimoCacheManager $manager) {
+    $this->logManager = $manager;
+  }
+  
   
   /**
    * Get the name of this logger.
