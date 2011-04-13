@@ -3,6 +3,8 @@
  * The storable interface definition.
  */
 
+namespace Villain;
+
 /**
  * This interface describes a storable object.
  */

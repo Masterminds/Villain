@@ -3,6 +3,9 @@
  * Declares the generic decorator for StorableObject.
  */
 
+
+namespace Villain;
+
 /**
  * The decorator that can be extended and used with any storable.
  *
