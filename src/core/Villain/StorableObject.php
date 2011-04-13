@@ -38,6 +38,25 @@ namespace Villain;
  */
 class StorableObject implements Storable {
   
+  // CLASS:
+  
+  /**
+   * Create a new instance from an array.
+   *
+   * This is a convenience function that can be used in lieu of creating 
+   * a new object and then instantiating it.
+   */
+  public static function newFromArray($array) {
+    
+    $klass = get_called_class();
+    $o = new $klass();
+    $o->fromArray($array);
+    
+    return $o;
+  }
+  
+  // INSTANCE:
+  
   protected $storage = array();
   
   public function __get($name) {

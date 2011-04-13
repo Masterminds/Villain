@@ -69,6 +69,27 @@ class StorableObjectTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals('hello', $o->baz[0]);
   }
   
+  public function testNewFromArray() {
+    $attrs = array(
+      'foo' => 1,
+      'bar' => 1.1,
+      'baz' => array('hello', 'world'),
+    );
+    
+    
+    $o = StorableObject::newFromArray($attrs);
+        
+    $this->assertEquals(1, $o->foo);
+    $this->assertEquals(1.1, $o->bar);
+    $this->assertEquals(2, count($o->baz));
+    $this->assertEquals('hello', $o->baz[0]);
+    
+    $o2 = StorableObjectTestExtension::newFromArray($attrs);
+    
+    $this->assertTrue($o2 instanceof StorableObjectTestExtension);
+    $this->assertEquals(1, $o2->foo);
+  }
+  
   public function testToArray() {
     $o = new StorableObject();
     
