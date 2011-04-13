@@ -9,11 +9,11 @@
 namespace \Villain\User;
 
 /**
- * A Fortissimo command.
+ * Provide basic functionality for user commands.
  *
  * @author Matt Butcher
  */
-class AbstractUserCommand extends \BaseFortissimoCommand {
+abstract class AbstractUserCommand extends \BaseFortissimoCommand {
 
   /**
    * Get the MongoDB collection that has the users in it.

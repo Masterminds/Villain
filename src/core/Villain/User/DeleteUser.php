@@ -7,7 +7,7 @@
  */
 
 /**
- * A Fortissimo command.
+ * Delete a given user.
  *
  * @author Matt Butcher
  */

@@ -9,7 +9,7 @@
 namespace \Villain\User;
 
 /**
- * A Fortissimo command.
+ * Given a username, load a user.
  *
  * @author Matt Butcher
  */

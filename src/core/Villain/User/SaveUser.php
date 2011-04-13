@@ -9,7 +9,17 @@
 namespace \Villain\User;
 
 /**
- * A Fortissimo command.
+ * Save a given user object.
+ *
+ * Note that while user objects can have all manner of arbitrary dangly apparatus, a
+ * user must have a username. It is recommended that you set it like this:
+ *
+ * @code
+ * <?php
+ * $user = new BaseUser();
+ * $user->setUsername('matt');
+ * ?>
+ * @endcode
  *
  * @author Matt Butcher
  */
@@ -39,6 +49,10 @@ class SaveUser extends AbstractUserCommand {
     $user = $this->param('user');
     if (!($user instanceof Storable)) {
       throw new \Villain\Exception('Attempted to store an entity that is not storable.');
+    }
+    
+    if (empty($user->getUsername)) {
+      throw new \Villain\Exception('User must have a username.');
     }
     
     $users = $this->getUsersCollection();

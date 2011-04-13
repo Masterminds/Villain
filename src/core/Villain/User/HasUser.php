@@ -9,7 +9,7 @@
 namespace \Villain\User;
 
 /**
- * A Fortissimo command.
+ * Check to see if a user record occurs for a given username.
  *
  * @author Matt Butcher
  */
