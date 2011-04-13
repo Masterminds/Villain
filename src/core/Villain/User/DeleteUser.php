@@ -1,27 +1,24 @@
 <?php
 /** @file
  *
- * LoadUser is a BaseFortissimoCommand class.
+ * DeleteUser is a BaseFortissimoCommand class.
  *
  * Created by Matt Butcher on 2011-04-13.
  */
-
-namespace \Villain\User;
 
 /**
  * A Fortissimo command.
  *
  * @author Matt Butcher
  */
-class LoadUser extends AbstractUserCommand {
+class DeleteUser extends BaseFortissimoCommand {
 
   public function expects() {
     return $this
-      ->description('Load a user')
-      ->usesParam('username', 'The username')
+      ->description('Deletes the user with the given username.')
+      ->usesParam('username', 'User name of user to delete.')
       ->withFilter('string')
       ->whichIsRequired()
-      //->whichHasDefault('some value')
       
       ->usesParam('datasource', 'The name of the MongoDB datasource to get.')
       ->withFilter('string')
@@ -31,19 +28,15 @@ class LoadUser extends AbstractUserCommand {
       ->withFilter('string')
       ->whichHasDefault('users')
       
-      ->andReturns('A user object.')
+      ->andReturns('Boolean indicating success or failure');
     ;
   }
 
   public function doCommand() {
+    $mongo = $this->context->ds($this->param('datasource'))->get();
+    $users = $mongo->useCollection($this->param('collection'));
     
-    $users = $this->getUsersCollection();
-    
-    $userData = $users->findOne(array('username' => $this->param('username')));
-    
-    $user = BaseUser::newFromArray($userData);
-    
-    return $user;
+    return $users->remove(array('username' => $this->param('username')));
   }
 }
 
