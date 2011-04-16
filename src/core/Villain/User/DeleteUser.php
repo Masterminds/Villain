@@ -6,6 +6,8 @@
  * Created by Matt Butcher on 2011-04-13.
  */
 
+namespace Villain\User;
+
 /**
  * Delete a given user.
  *
@@ -20,9 +22,8 @@ class DeleteUser extends BaseFortissimoCommand {
       ->withFilter('string')
       ->whichIsRequired()
       
-      ->usesParam('datasource', 'The name of the MongoDB datasource to get.')
+      ->usesParam('datasource', 'The name of the MongoDB datasource to get. If not set, the default datasource will be used.')
       ->withFilter('string')
-      ->whichHasDefault('villain')
       
       ->usesParam('collection', 'The MongoDB collection to use for accessing users')
       ->withFilter('string')

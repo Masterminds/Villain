@@ -4,7 +4,7 @@
  */
 
 
-namespace \Villain\Storage;
+namespace Villain\Storage;
 
 /**
  * The decorator that can be extended and used with any storable.

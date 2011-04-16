@@ -25,7 +25,6 @@ class LoadUser extends AbstractUserCommand {
       
       ->usesParam('datasource', 'The name of the MongoDB datasource to get.')
       ->withFilter('string')
-      ->whichHasDefault('villain')
       
       ->usesParam('collection', 'The MongoDB collection to use for accessing users')
       ->withFilter('string')
