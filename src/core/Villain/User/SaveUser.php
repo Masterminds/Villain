@@ -6,7 +6,7 @@
  * Created by Matt Butcher on 2011-04-13.
  */
 
-namespace \Villain\User;
+namespace Villain\User;
 
 /**
  * Save a given user object.

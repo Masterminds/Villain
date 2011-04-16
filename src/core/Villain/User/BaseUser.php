@@ -3,7 +3,7 @@
  * The main user storable object.
  */
 
-namespace \Villain\User;
+namespace Villain\User;
 
 /**
  * The main user Storable object.

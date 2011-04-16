@@ -5,7 +5,7 @@
  * This file declares the StorableObject.
  */
 
-namespace Villain;
+namespace Villain\Storage;
 
 /**
  * An object which can provide a storable version of itself.

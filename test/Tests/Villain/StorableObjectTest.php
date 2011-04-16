@@ -1,7 +1,7 @@
 <?php
-require_once 'Villain/StorableObject.php';
+require_once 'Villain/Storage/StorableObject.php';
 
-use \Villain\StorableObject;
+use \Villain\Storage\StorableObject;
 
 class StorableObjectTest extends PHPUnit_Framework_TestCase {
   
