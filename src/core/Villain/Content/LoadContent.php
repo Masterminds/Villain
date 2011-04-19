@@ -95,7 +95,8 @@ class LoadContent extends AbstractContentCommand {
    * Do any preparation of the storable object.
    *
    * Subclasses may extend this to modify the object before it is inserted into
-   * the context.
+   * the context. This is called *after* the `onLoad` event is fired, which means
+   * that modifications made by event handlers will be accessible in this method.
    *
    * Since this is an object, any modifications made to $storable will be accessible
    * outside of this method.
