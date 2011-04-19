@@ -30,6 +30,7 @@ class LoadUser extends AbstractUserCommand {
       ->withFilter('string')
       ->whichHasDefault('users')
       
+      // Events.
       ->declaresEvent('preLoad', 'Before user is loaded, this event is fired. It is given an object with the $username attribute set.')
       ->declaresEvent('onLoad', 'After user is loaded, this event is fired. It is given the BaseUser object')
       ->declaresEvent('onNotFound', 'If no such user is found, this event is fired. It is given an object with the $username set.')

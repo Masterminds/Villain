@@ -11,9 +11,21 @@ namespace Villain\User;
 /**
  * Delete a given user.
  *
+ * This deletes a user by username.
+ *
+ * Params:
+ * - username
+ * - datasource
+ * - collection
+ *
+ * Events
+ * - preDelete
+ * - onDelete
+ * - onFailedDelete
+ *
  * @author Matt Butcher
  */
-class DeleteUser extends BaseFortissimoCommand {
+class DeleteUser extends AbstractUserCommand {
 
   public function expects() {
     return $this
@@ -29,15 +41,55 @@ class DeleteUser extends BaseFortissimoCommand {
       ->withFilter('string')
       ->whichHasDefault('users')
       
+      ->declaresEvent('preDelete', 'Fired before delete event.')
+      ->declaresEvent('onDelete', 'Fired after delete event ONLY IF the delete succeeded.')
+      ->declaresEvent('onFailedDelete', 'Fired after delete event ONLY IF the delete failed.')
+      
       ->andReturns('Boolean indicating success or failure');
     ;
   }
 
   public function doCommand() {
-    $mongo = $this->context->ds($this->param('datasource'))->get();
-    $users = $mongo->useCollection($this->param('collection'));
+    $username = $this->param('username');
     
-    return $users->remove(array('username' => $this->param('username')));
+    $result = $this->doDelete($username);
+    
+    return $result;
+  }
+  
+  /**
+   * Delete a user by username.
+   *
+   * Events:
+   * - preDelete: Fired before delete is attempt. $data is passed with $username. If $username 
+   *   is modified, then the modified username will be used. DANGER!
+   * - onDelete: Fired when deletion succeeds. $data has the $username that was deleted.
+   * - onFailedDelete: Fired when deletion fails (i.e. user not found). $data has the $username that
+   *   was deleted.
+   *
+   * @param string $username
+   *  The username
+   * @return boolean
+   *  The return value of the delete operation.
+   */
+  protected function doDelete($username) {
+    
+    $data = new stdClass();
+    $data->username = $username;
+    $this->fireEvent('preDelete', $data);
+    $username = $data->username;
+    
+    $users = $this->getUsersCollection();
+    $retval = $users->remove(array('username' => $username));
+    
+    if ($retval) {
+      $this->fireEvent('onDelete', $data);
+    }
+    else {
+      $this->fireEvent('onFailedDelete', $data);
+    }
+    
+    return $retval;
   }
 }
 
