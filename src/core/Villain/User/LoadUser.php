@@ -28,7 +28,7 @@ class LoadUser extends \Villain\Content\AbstractContentCommand {
       
       ->usesParam('collection', 'The MongoDB collection to use for accessing users')
       ->withFilter('string')
-      ->whichHasDefault('users')
+      ->whichHasDefault(self::DEFAULT_USER_COLLECTION)
       
       // Events.
       ->declaresEvent('preLoad', 'Before user is loaded, this event is fired. It is given an object with the $username attribute set.')
