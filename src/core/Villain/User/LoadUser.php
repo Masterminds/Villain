@@ -13,7 +13,7 @@ namespace Villain\User;
  *
  * @author Matt Butcher
  */
-class LoadUser extends AbstractUserCommand {
+class LoadUser extends \Villain\Content\AbstractContentCommand {
 
   public function expects() {
     return $this
@@ -45,7 +45,7 @@ class LoadUser extends AbstractUserCommand {
     
     $user = $this->loadUser($username);
     
-    $this->prepareUser($user);
+    $user = $this->prepareUser($user);
     
     return $user;
   }
@@ -55,48 +55,46 @@ class LoadUser extends AbstractUserCommand {
    *
    * Fires:
    * - preLoad: Given an object with $username. If username is changed, the changed value will be used.
-   * - onLoad: Given the BaseUser object. Changes to that object will be propogated.
+   * - onLoad: Given the BaseUser object. Changes to that object will be propagated.
    * - onNotFound: Given an object with $username.
    *
    * @param string $username
    *  The name of the user to find.
+   * @param MongoCollection $collection
+   *  The collection to search.
    * @return BaseUser
    *  A BaseUser with the user's data.
    */
-  protected function loadUser($username) {
+  protected function loadUser($username, $collection) {
     
-    // Fire preLoad and give it a chance to modify the username.
-    $data = new stdClass();
-    $data->username = $username;
-    $data->commandName = $this->name;
-    $this->fireEvent('preLoad', $data);
-    $username = $data->username;
+    $query = array('username' => $username);
     
-    $users = $this->getUsersCollection();
-    
-    $userData = $users->findOne(array('username' => $username));
-    
-    if (empty($userData)) {
-      $this->fireEvent('onNotFound', $data);
-      return;
-    }
-    
-    $user = BaseUser::newFromArray($userData);
-    $this->fireEvent('onLoad', $user);
-    return $user;
+    return $this->loadContent($query, $collection);
+  }
+  
+  /**
+   * Convert a storable array into a BaseUser.
+   *
+   * @param array $array
+   *  Data returned from database.
+   * @return BaseUser
+   *  A BaseUser user object.
+   */
+  protected function createStorable($array) {
+    // This gets called by loadContent.
+    return BaseUser::newFromArray($array);
   }
   
   /**
    * Prepare the user object.
    *
-   * This is called after the 'onLoad' event, and can be used to alter the user. Note that since
-   * the passed-in value is an object, changes are visible outside of this method.
+   * This is called after the 'onLoad' event, and can be used to alter the user.
    *
    * @param BaseUser $user
    *  The user as a BaseUser object.
    */
   protected function prepareUser($user) {
-    return;
+    return $user;
   }
 }
 

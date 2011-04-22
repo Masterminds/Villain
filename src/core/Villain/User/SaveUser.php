@@ -23,7 +23,7 @@ namespace Villain\User;
  *
  * @author Matt Butcher
  */
-class SaveUser extends AbstractUserCommand {
+class SaveUser extends \Villain\Content\AbstractContentCommand {
 
   public function expects() {
     return $this
@@ -36,16 +36,20 @@ class SaveUser extends AbstractUserCommand {
       
       ->usesParam('collection', 'The MongoDB collection to use for accessing users')
       ->withFilter('string')
-      ->whichHasDefault('users')
+      ->whichHasDefault(self::DEFAULT_USER_COLLECTION)
       
+      ->declaresEvent('preSave', 'Fires before the user is saved.')
+      ->declaresEvent('onSave', 'Fires after the user is saved.')
+      ->declaresEvent('onSaveError', 'Fires if the user failed.')
       
       ->andReturns('The saved object.')
     ;
   }
 
   public function doCommand() {
-    
+    $collection = $this->getCollection();
     $user = $this->param('user');
+    
     if (!($user instanceof Storable)) {
       throw new \Villain\Exception('Attempted to store an entity that is not storable.');
     }
@@ -53,15 +57,8 @@ class SaveUser extends AbstractUserCommand {
     if (empty($user->getUsername)) {
       throw new \Villain\Exception('User must have a username.');
     }
-  }
-  
-  protected function doSave() {
     
-    $users = $this->getUsersCollection();
-    
-    $users->save($user->toArray());
-
-  }
-  
+    return $this->doSave($user, $collection);
+  }  
 }
 

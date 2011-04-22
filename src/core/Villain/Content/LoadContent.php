@@ -60,6 +60,28 @@ class LoadContent extends AbstractContentCommand {
     return $result;
   }
   
+  protected function loadContent(&$query, $collection) {
+    // Fire the preload event.
+    $e = $this->baseEvent();
+    $e->query = $query;
+    $this->fireEvent('preLoad', $e);
+    
+    // Search for the document.
+    $result = $collection->findOne($query);
+    
+    // If not found, fire the appropriate event and return.
+    if (empty($result)) {
+      $this->fireEvent('onNotFound', $e);
+      return;
+    }
+    
+    // If found, make it Storable and fire onLoad event.
+    $object = $this->createStorable($result);
+    $e->data = $object;
+    $this->fireEvent('onLoad', $e);    
+    return $object;
+  }
+  
   /**
    * Load a document from the MongoDB.
    *
@@ -81,27 +103,9 @@ class LoadContent extends AbstractContentCommand {
       $id = new MongoId((string)$id);
     }
     
-    // Fire the preload event.
-    $e = $this->baseEvent();
-    $e->id = $id;
-    $this->fireEvent('preLoad', $e);
-    
     // Search for the document.
-    
     $search = array('_id' => $id);
-    $result = $collection->findOne($search);
-    
-    // If not found, fire the appropriate event and return.
-    if (empty($result)) {
-      $this->fireEvent('onNotFound', $e);
-      return;
-    }
-    
-    // If found, make it Storable and fire onLoad event.
-    $object = $this->createStorable($result);
-    $e->data = $object;
-    $this->fireEvent('onLoad', $e);    
-    return $object;
+    return $this->loadContent($query, $collection);
   }
   
   /**
