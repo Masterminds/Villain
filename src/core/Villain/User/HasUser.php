@@ -13,7 +13,7 @@ namespace Villain\User;
  *
  * @author Matt Butcher
  */
-class HasUser extends AbstractUserCommand {
+class HasUser extends \Villain\Content\AbstractContentCommand {
 
   public function expects() {
     return $this
