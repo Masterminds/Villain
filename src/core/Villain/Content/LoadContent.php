@@ -1,7 +1,7 @@
 <?php
 /** @file
  *
- * LoadContent is a BaseFortissimoCommand class.
+ * LoadContent loads a piece of content.
  *
  * Created by Matt Butcher on 2011-04-19.
  */
@@ -12,6 +12,16 @@ namespace Villain\Content;
  * Load a piece of content from the MongoDB.
  *
  * This retrieves a piece of content and returns it as a Storable.
+ *
+ * Expects:
+ * - id
+ * - datasource
+ * - collection
+ *
+ * Fires:
+ * - preLoad
+ * - onLoad
+ * - onNotFound
  *
  * @author Matt Butcher
  */
@@ -42,10 +52,10 @@ class LoadContent extends AbstractContentCommand {
   public function doCommand() {
     
     $id = $this->param('id');
+    $collection = $this->getCollection();
     
-    $result = $this->loadById($id);
-    
-    $this->prepareContent($result);
+    $result = $this->loadById($id, $collection);
+    $result = $this->prepareContent($result);
     
     return $result;
   }
@@ -59,10 +69,12 @@ class LoadContent extends AbstractContentCommand {
    *
    * @param mixed $id
    *   A string or a MongoId object that identifies the desired piece of content.
+   * @param MongoCollection $collection
+   *   A collection to search.
    * @return StorableObject
    *  The content as a StorableObject.
    */
-  protected function loadById($id) {
+  protected function loadById($id, $collection) {
     
     // Make sure $id gets transformed into a MongoID.
     if (!($id instanceof MongoID)) {
@@ -70,25 +82,41 @@ class LoadContent extends AbstractContentCommand {
     }
     
     // Fire the preload event.
-    $preloadData = new stdClass;
-    $preloadData->id = $id;
-    $this->fireEvent('preLoad', $preloadData);
+    $e = $this->baseEvent();
+    $e->id = $id;
+    $this->fireEvent('preLoad', $e);
     
     // Search for the document.
-    $collection = $this->getContentCollection();
+    
     $search = array('_id' => $id);
     $result = $collection->findOne($search);
     
     // If not found, fire the appropriate event and return.
     if (empty($result)) {
-      $this->fireEvent('onNotFound', $preloadData);
+      $this->fireEvent('onNotFound', $e);
       return;
     }
     
     // If found, make it Storable and fire onLoad event.
-    $object = StorableObject::newFromArray($result);
-    $this->fireEvent('onLoad', $object);    
+    $object = $this->createStorable($result);
+    $e->data = $object;
+    $this->fireEvent('onLoad', $e);    
     return $object;
+  }
+  
+  /**
+   * Given an array, return a suitable Storable.
+   *
+   * The default instance returns a StorableObject, but subclasses may choose another
+   * Storable or wrap with a StorableObjectDecorator.
+   *
+   * @param array $array
+   *  An associative array.
+   * @return Storable
+   *  A storable representing the array's contents.
+   */
+  protected function createStorable($array) {
+    return StorableObject::newFromArray($array);
   }
   
   /**
@@ -98,14 +126,18 @@ class LoadContent extends AbstractContentCommand {
    * the context. This is called *after* the `onLoad` event is fired, which means
    * that modifications made by event handlers will be accessible in this method.
    *
-   * Since this is an object, any modifications made to $storable will be accessible
-   * outside of this method.
+   * This method returns a Storable which may be the same as the one passed in. However,
+   * it is possible to return a clone, another object, or a decorator. For that reason, 
+   * it is best to use the returned Storable and not assume that the passed in Storable
+   * was modified.
    *
    * @param StorableObject $storable
    *  The document. It should always have an _id, which will be an instance of MongoId.
+   * @return Storable
+   *  The prepared storable.
    */
   protected function prepareContent($storable) {
-    return;
+    return $storable;
   }
 }
 

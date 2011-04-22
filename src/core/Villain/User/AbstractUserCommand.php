@@ -37,5 +37,14 @@ abstract class AbstractUserCommand extends \BaseFortissimoCommand {
     return $users;
   }
   
+  /**
+   * Generate a base event object to be passed into events.
+   */
+  protected function baseEvent() {
+    $e = new stdClass();
+    
+    $e->commandName = $this->name;
+  }
+  
 }
 

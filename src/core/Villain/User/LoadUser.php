@@ -68,6 +68,7 @@ class LoadUser extends AbstractUserCommand {
     // Fire preLoad and give it a chance to modify the username.
     $data = new stdClass();
     $data->username = $username;
+    $data->commandName = $this->name;
     $this->fireEvent('preLoad', $data);
     $username = $data->username;
     

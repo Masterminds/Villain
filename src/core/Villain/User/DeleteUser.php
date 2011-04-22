@@ -25,7 +25,7 @@ namespace Villain\User;
  *
  * @author Matt Butcher
  */
-class DeleteUser extends AbstractUserCommand {
+class DeleteUser extends \Villain\Content\DeleteContent {
 
   public function expects() {
     return $this
@@ -39,7 +39,7 @@ class DeleteUser extends AbstractUserCommand {
       
       ->usesParam('collection', 'The MongoDB collection to use for accessing users')
       ->withFilter('string')
-      ->whichHasDefault('users')
+      ->whichHasDefault(self::DEFAULT_USER_COLLECTION) // FIXME?
       
       ->declaresEvent('preDelete', 'Fired before delete event.')
       ->declaresEvent('onDelete', 'Fired after delete event ONLY IF the delete succeeded.')
@@ -52,44 +52,10 @@ class DeleteUser extends AbstractUserCommand {
   public function doCommand() {
     $username = $this->param('username');
     
-    $result = $this->doDelete($username);
+    $query = array('username' => $username);
+    $collection = $this->getCollection();
     
-    return $result;
-  }
-  
-  /**
-   * Delete a user by username.
-   *
-   * Events:
-   * - preDelete: Fired before delete is attempt. $data is passed with $username. If $username 
-   *   is modified, then the modified username will be used. DANGER!
-   * - onDelete: Fired when deletion succeeds. $data has the $username that was deleted.
-   * - onFailedDelete: Fired when deletion fails (i.e. user not found). $data has the $username that
-   *   was deleted.
-   *
-   * @param string $username
-   *  The username
-   * @return boolean
-   *  The return value of the delete operation.
-   */
-  protected function doDelete($username) {
-    
-    $data = new stdClass();
-    $data->username = $username;
-    $this->fireEvent('preDelete', $data);
-    $username = $data->username;
-    
-    $users = $this->getUsersCollection();
-    $retval = $users->remove(array('username' => $username));
-    
-    if ($retval) {
-      $this->fireEvent('onDelete', $data);
-    }
-    else {
-      $this->fireEvent('onFailedDelete', $data);
-    }
-    
-    return $retval;
+    return $this->doDelete($query, $collection);
   }
 }
 

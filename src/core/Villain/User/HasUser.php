@@ -30,12 +30,21 @@ class HasUser extends AbstractUserCommand {
       ->withFilter('string')
       ->whichHasDefault('users')
       
+      ->declaresEvent('preSearch', 'Event fired before looking to see if user exists.')
+      
       ->andReturns('TRUE if the user exists, FALSE otherwise.')
     ;
   }
 
   public function doCommand() {
     $users = $this->getUsersCollection();
+    
+    $data = new stdClass();
+    $data->username = $username;
+    $data->commandName = $this->name;
+    $this->fireEvent('preSearch', $data);
+    $username = $data->username;
+    
     
     $user = $users->findOne(array('username' => $this->param('username')), array('username'));
     

@@ -18,6 +18,7 @@ namespace Villain\Content;
 abstract class AbstractContentCommand extends BaseFortissimoCommand {
 
   const DEFAULT_COLLECTION = 'content';
+  const DEFAULT_USER_COLLECTION = 'users';
 
   /**
    * Get the MongoDB collection that has the content in it.
@@ -29,7 +30,7 @@ abstract class AbstractContentCommand extends BaseFortissimoCommand {
    * @return MongoCollection
    *  The MongoCollection that contains user accounts.
    */
-  public function getContentCollection() {
+  protected function getCollection() {
     
     // If no datasource is set, ds() will return the default datasource.
     $ds = $this->param('datasource');
@@ -43,6 +44,15 @@ abstract class AbstractContentCommand extends BaseFortissimoCommand {
     $collection = $mongo->useCollection($this->param('collection', self::DEFAULT_COLLECTION));
     
     return $collection;
+  }
+  
+  /**
+   * Generate a base event object to be passed into events.
+   */
+  protected function baseEvent() {
+    $e = new stdClass();
+    
+    $e->commandName = $this->name;
   }
 
 }

@@ -39,7 +39,7 @@ class SaveUser extends AbstractUserCommand {
       ->whichHasDefault('users')
       
       
-      ->andReturns('Boolean TRUE if stored.')
+      ->andReturns('The saved object.')
     ;
   }
 
@@ -53,6 +53,9 @@ class SaveUser extends AbstractUserCommand {
     if (empty($user->getUsername)) {
       throw new \Villain\Exception('User must have a username.');
     }
+  }
+  
+  protected function doSave() {
     
     $users = $this->getUsersCollection();
     
