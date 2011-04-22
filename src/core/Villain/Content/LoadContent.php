@@ -60,6 +60,22 @@ class LoadContent extends AbstractContentCommand {
     return $result;
   }
   
+  /**
+   * Given a query and a collection, load the matching document.
+   *
+   * This assumes that the query has a uniqueness condition that will prevent
+   * multiple matches. Really, it's designed for ID-based matches.
+   *
+   * Fires:
+   * - preLoad
+   * - onLoad
+   * - onNotFound
+   *
+   * @param array &$query
+   *  The query.
+   * @param MongoCollection $collection
+   *  The collection to search.
+   */
   protected function loadContent(&$query, $collection) {
     // Fire the preload event.
     $e = $this->baseEvent();
@@ -95,6 +111,7 @@ class LoadContent extends AbstractContentCommand {
    *   A collection to search.
    * @return StorableObject
    *  The content as a StorableObject.
+   * @see loadContent()
    */
   protected function loadById($id, $collection) {
     
