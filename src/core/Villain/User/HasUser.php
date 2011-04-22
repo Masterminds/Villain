@@ -28,7 +28,7 @@ class HasUser extends \Villain\Content\AbstractContentCommand {
       
       ->usesParam('collection', 'The MongoDB collection to use for accessing users')
       ->withFilter('string')
-      ->whichHasDefault('users')
+      ->whichHasDefault(self::DEFAULT_USER_COLLECTION)
       
       ->declaresEvent('preSearch', 'Event fired before looking to see if user exists.')
       
@@ -37,16 +37,13 @@ class HasUser extends \Villain\Content\AbstractContentCommand {
   }
 
   public function doCommand() {
-    $users = $this->getUsersCollection();
+    $users = $this->getCollection();
     
-    $data = new stdClass();
-    $data->username = $username;
-    $data->commandName = $this->name;
+    $data = $this->createEvent();
+    $data->username =& $username;
     $this->fireEvent('preSearch', $data);
-    $username = $data->username;
     
-    
-    $user = $users->findOne(array('username' => $this->param('username')), array('username'));
+    $user = $users->findOne(array('username' => $username), array('username'));
     
     return !empty($user);
   }
