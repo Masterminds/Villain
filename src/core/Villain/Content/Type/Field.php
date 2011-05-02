@@ -15,6 +15,7 @@ abstract class Field {
   protected $decscription = NULL;
   protected $max_repeat = 1;
   protected $min_repeat = 0;
+  protected $default_value = NULL;
   
   /**
    * Construct a new Field.
@@ -32,6 +33,13 @@ abstract class Field {
   }
   public function setDescription($desc) {
     $this->description = $desc;
+  }
+  
+  public function setDefaultValue($val) {
+    $this->default_value = $val;
+  }
+  public function getDefaultValue() {
+    return $this->defaultValue;
   }
   
   
@@ -55,6 +63,7 @@ abstract class Field {
       'max_repeat' => $this->max_repeat,
       'min_repeat' => $this->min_repeat,
       'description' => $this->description,
+      'default_value' => $this->default_value,
     );
   }
   

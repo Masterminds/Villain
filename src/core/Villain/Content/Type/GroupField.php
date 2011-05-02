@@ -24,6 +24,10 @@ class GroupField extends Field {
     $this->fields[] = $f;
   }
   
+  public function setDefaultValue($val) {
+    throw new Exception('Cannot set a default value on a group of fields.');
+  }
+  
   /**
    * Set an entire array of Field objects at once.
    */
