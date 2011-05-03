@@ -47,6 +47,24 @@ namespace Villain\Storage;
  *   operations.
  * - Other objects will be cast into arrays.
  * - Resources will be replaced with NULL values.
+ *
+ * Example of serializing nested storable objects:
+ *
+ * @code
+ * <?php
+ * $parent = new StorableObject();
+ * $child = new SubclassOfStorableObject();
+ * 
+ * $parent->setChild($child);
+ *
+ * $serialized = $parent->toArray();
+ *
+ * $unserialized = StorableObject::newFromArray($serialized);
+ *
+ * // This will be TRUE.
+ * $unserialized->getChild() instanceof SubclassOfStorableObject;
+ * ?>
+ * @endcode
  * 
  */
 class StorableObject implements Storable {
