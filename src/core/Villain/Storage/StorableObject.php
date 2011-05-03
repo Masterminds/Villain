@@ -34,9 +34,24 @@ namespace Villain\Storage;
  * The base class also implements the __get() and __set() magic methods, which means that
  * any arbitrary property can be set or retrieved using those accessors. It also implements
  * a magic __call() function which handles setter/getter calls.
+ *
+ * SERIALIZATION AND OBJECTS
+ *
+ * When toArray() is called on a StorableObject, the object will be serialized into an 
+ * associative array. This introduces several serialization nuances:
+ *
+ * - Scalars will be left alone
+ * - Arrays will be left alone
+ * - Attributes that are Storable objects will be serialized using their own toArray() method,
+ *   and will be serialized in such a way that they can be reconstituted during fromArray() 
+ *   operations.
+ * - Other objects will be cast into arrays.
+ * - Resources will be replaced with NULL values.
  * 
  */
 class StorableObject implements Storable {
+  
+  const AUTOCAST_KEY = '__storable_autocast';
   
   // CLASS:
   
@@ -124,11 +139,50 @@ class StorableObject implements Storable {
   }
   
   public function toArray() {
-    return $this->storage;
+    $data = array();
+    
+    foreach ($this->storage as $name => $val) {
+      
+      // Convert objects to arrays.
+      if (is_object($val)) {
+        if ($val instanceof Storable) {
+          $klass = get_class($val);
+          $val = $val->toArray();
+          $val[self::AUTOCAST_KEY] = $klass;
+        }
+        else {
+          $val = (array)$val;
+        }
+      }
+      $data[$name] = $val;
+    }
+    
+    return $data;
   }
   
   
   public function fromArray(array $data) {
+    
     $this->storage = $data;
+    
+    // Autocast only when necessary.
+    foreach ($data as $name => $val) {
+      // If the value is registered to use an autocast, we
+      // need to create the class.
+      if (is_array($val) && !empty($val[self::AUTOCAST_KEY])) {
+        // Get the class name
+        $klass = $val[self::AUTOCAST_KEY];
+        // Create an instance.
+        $obj = new $klass();
+        // Get rid of a metadatum.
+        unset($val[self::AUTOCAST_KEY]);
+        
+        // Load the object.
+        $obj->fromArray($val);
+        // Set it as a value.
+        $this->storage[$name] = $obj;
+      }
+    }
+    
   }
 }
