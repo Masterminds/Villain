@@ -51,7 +51,7 @@ abstract class AbstractContentCommand extends BaseFortissimoCommand {
    */
   protected function baseEvent() {
     $e = new stdClass();
-    
+    $e->context = $this->context;
     $e->commandName = $this->name;
   }
 
