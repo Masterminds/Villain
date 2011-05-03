@@ -3,6 +3,8 @@
  * Declaration of the StorableObject.
  *
  * This file declares the StorableObject.
+ *
+ * @ingroup VillainStorage
  */
 
 namespace Villain\Storage;
@@ -66,6 +68,7 @@ namespace Villain\Storage;
  * ?>
  * @endcode
  * 
+ * @ingroup VillainStorage
  */
 class StorableObject implements Storable {
   
