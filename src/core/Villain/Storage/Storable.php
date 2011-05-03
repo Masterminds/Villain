@@ -14,6 +14,13 @@
  * StorableObjectDecorator.
  */
 
+/**
+ * The Villain storage system.
+ *
+ * Villain provides a seemless translation layer for persisting Villain objects. This is
+ * the Storage layer. Objects that are Storable can be stored in the Villain database. The
+ * StorableObject is the main type of stored content.
+ */
 namespace Villain\Storage;
 
 /**
