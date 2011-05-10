@@ -132,6 +132,21 @@ class StorableObjectTest extends PHPUnit_Framework_TestCase {
   }
   */
   
+  public function testAutocast() {
+    
+    $foo = new StorableObject();
+    $bar = new StorableObjectTestExtension();
+    $foo->setBar($bar);
+    
+    $ser = $foo->toArray();
+    
+    $this->assertEquals('StorableObjectTestExtension', $ser['bar'][StorableObject::AUTOCAST_KEY]);
+    
+    $newObj = StorableObject::newFromArray($ser);
+    $this->assertTrue($newObj->getBar() instanceof StorableObjectTestExtension);
+    
+  }
+  
 }
 
 class StorableObjectTestExtension extends StorableObject {

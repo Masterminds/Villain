@@ -6,6 +6,17 @@
  * Created by Matt Butcher on 2011-04-19.
  */
 
+/**
+ * This package defines the generic content system for Villain.
+ *
+ * "Content" is a generic abstraction in Villain that describes any piece of 
+ * data that is considered content. The Content system is built atop the Villain Storage system 
+ * (See Villain::Storage::Storable), though not all Storable objects are also content.
+ *
+ * Content types are defined using the Villain Content Type system (See 
+ * Villain::Content::Type::TypeDefinition). 
+ *
+ */
 namespace Villain\Content;
 
 /**
@@ -51,7 +62,7 @@ abstract class AbstractContentCommand extends BaseFortissimoCommand {
    */
   protected function baseEvent() {
     $e = new stdClass();
-    
+    $e->context = $this->context;
     $e->commandName = $this->name;
   }
 

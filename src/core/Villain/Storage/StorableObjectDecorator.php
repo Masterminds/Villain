@@ -1,6 +1,8 @@
 <?php
 /** @file
  * Declares the generic decorator for StorableObject.
+ *
+ * @ingroup VillainStorage
  */
 
 
@@ -18,6 +20,8 @@ namespace Villain\Storage;
  * pattern with a twist. It allows the attachment of arbitrary methods.
  *
  * The object itself implements the entire StorableObject 
+ *
+ * @ingroup VillainStorage
  */
 class StorableObjectDecorator implements Storable {
   

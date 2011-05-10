@@ -1,4 +1,14 @@
 <?php
+/** @file
+ * Villian String utilities.
+ */
+
+/**
+ * The Villain utilities.
+ *
+ * This section provides a handful of utilities that do not exist in PHP or other
+ * libraries upon which Villain depends.
+ */
 namespace Villain\Util;
 
 /**
