@@ -20,10 +20,16 @@ Config::datasource('db') // Name of datasource
  * Just about every page should bootstrap.
  */
 Config::group('bootstrap')
-  ->doesCommand('config')->whichInvokes('FortissimoAddToContext')
-    ->withParam('site_name')->whoseValueIs('Villain')
+  ->doesCommand('config')->whichInvokes('Villain\Configuration\AddIniToContext')
+    ->withParam('filename')->whoseValueIs('config/villain.ini')
   //->doesCommand('some_command')->whichInvokes('SomeCommandClass')
   //->doesCommand('some_other_command')->whichInvokes('SomeOtherCommandClass')
+;
+
+Config::group('renderHTML')
+  ->doesCommand('theme_init')
+    ->whichInvokes('InitializeTheme')
+    ->withParam('path')->from('cxt:site.theme')->whoseDefaultIs('theme/vanilla')
 ;
 
 /*
@@ -32,6 +38,15 @@ Config::group('bootstrap')
  */
 Config::group('auth')
 
+;
+
+Config::request('test')
+  ->usesGroup('bootstrap')
+  ->doesCommand('dump')->whichInvokes('FortissimoContextDump')
+;
+
+Config::request('login')
+  ->usesGroup('bootstrap')
 ;
 
 /*
