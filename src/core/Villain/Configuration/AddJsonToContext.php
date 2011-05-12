@@ -6,6 +6,8 @@
  * Created by Matt Butcher on 2011-05-10.
  */
 
+namespace Villain\Configuration;
+
 /**
  * Import JSON data directly into the context.
  *
@@ -30,7 +32,7 @@
  *
  * @author Matt Butcher
  */
-class AddJsonToContext extends BaseFortissimoCommand {
+class AddJsonToContext extends \BaseFortissimoCommand {
 
   public function expects() {
     return $this
@@ -50,7 +52,9 @@ class AddJsonToContext extends BaseFortissimoCommand {
     
     $json = json_decode($raw_data);
     
-    $e = $this->baseEvent();
+    $e = new \stdClass();
+    $e->context = $this->context;
+    $e->commandName = $this->name;
     $e->data =& $json;
     $this->fireEvent('onLoad', $e);
     

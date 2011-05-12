@@ -7,14 +7,36 @@
  */
 
 /**
+ * Configuration commands.
+ */
+namespace Villain\Configuration;
+
+/**
  * Parse INI files and insert the data into the context.
  *
  * This parses configuration files in the INI format (like php.ini) and places
  * the configuration into the context.
  *
+ * Example INI:
+ * @code
+ * site.name = Villain
+ * site.something = Something
+ *
+ * [database]
+ * db.name = villain
+ * @endcode
+ *
+ * By default, the above will be inserted into the context with three keys:
+ * - site.name
+ * - site.something
+ * - database
+ *
+ * The `database` section will contain an array of all directives beneath it.
+ * 
+ *
  * @author Matt Butcher
  */
-class AddIniToContext extends BaseFortissimoCommand {
+class AddIniToContext extends \BaseFortissimoCommand {
 
   public function expects() {
     return $this
@@ -38,9 +60,11 @@ class AddIniToContext extends BaseFortissimoCommand {
     $parseSections = $this->param('parseSections');
     $useSection = $this->param('useSection', NULL);
     
-    $ini = parse_ini_file($filename, $parseSection);
+    $ini = parse_ini_file($filename, $parseSections);
     
-    $e = $this->baseEvent();
+    $e = new \stdClass();
+    $e->context = $this->context;
+    $e->commandName = $this->name;
     $e->data =& $ini;
     $this->fireEvent('onLoad', $e);
     
