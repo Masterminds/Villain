@@ -26,7 +26,7 @@ namespace Villain\Content;
  *
  * @author Matt Butcher
  */
-abstract class AbstractContentCommand extends BaseFortissimoCommand {
+abstract class AbstractContentCommand extends \BaseFortissimoCommand {
 
   const DEFAULT_COLLECTION = 'content';
   const DEFAULT_USER_COLLECTION = 'users';
@@ -61,7 +61,7 @@ abstract class AbstractContentCommand extends BaseFortissimoCommand {
    * Generate a base event object to be passed into events.
    */
   protected function baseEvent() {
-    $e = new stdClass();
+    $e = new \stdClass();
     $e->context = $this->context;
     $e->commandName = $this->name;
   }
