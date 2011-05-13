@@ -6,10 +6,12 @@
  * Created by Matt Butcher on 2011-05-12.
  */
 
+namespace Villain\Theme;
+
 /**
  * Defines CoreThemePackage.
  */
-class CoreThemePackage extends BaseThemePackage {
+class CoreThemePackage extends \BaseThemePackage {
   
   public function templates() {
     return array(
