@@ -124,6 +124,20 @@ class Collection implements \Countable, \Iterator {
   }
 
   /**
+   * Return the form object this Collection is attached to.
+   *
+   * @return Villain\Form\Form
+   *   The parent form object up the chian of objects.
+   */
+  public function returnForm() {
+    if ($this->parent) {
+      return $this->parent;
+    }
+    // No parent.
+    throw new \Villain\Exception('Collection trying to return parent Form when not attached to a Form.');
+  }
+
+  /**
    * Get the names of the elements in the collection.
    *
    * @return array

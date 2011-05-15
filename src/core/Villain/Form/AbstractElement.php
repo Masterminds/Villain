@@ -359,4 +359,18 @@ abstract class AbstractElement {
 
     return $attributes ? ' ' . implode(' ', $attributes) : '';
   }
+
+  /**
+   * Return the form object this element is attached to.
+   *
+   * @return Villain\Form\Form
+   *   The parent form object up the chian of objects.
+   */
+  public function returnForm() {
+    if ($this->parent) {
+      return $this->parent->returnForm();
+    }
+    // No parent.
+    throw new \Villain\Exception('Element trying to return parent Form when not attached to a Collection.');
+  }
 }

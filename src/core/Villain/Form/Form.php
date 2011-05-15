@@ -34,7 +34,7 @@ class Form extends AbstractElement {
    * Setup a form right out of the gate.
    */
   public function __construct() {
-    $this->collection = new Collection();
+    $this->collection = new Collection($this);
 
     // Set the action to the current url as a default.
     $this->action = $_SERVER['REQUEST_URI'];
@@ -51,6 +51,7 @@ class Form extends AbstractElement {
    */
   public function setCollection($collection) {
     $this->collection = $collection;
+    $this->collection->setParent($this);
     return $this;
   }
 
