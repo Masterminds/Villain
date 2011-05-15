@@ -22,5 +22,6 @@ class Config {
    */
   public static $elementMap = array(
     'textfield' => 'Villain\Form\Textfield',
+    'number' => 'Villain\Form\Number',
   );
 }
