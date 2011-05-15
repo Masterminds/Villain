@@ -90,12 +90,12 @@ class Collection implements \Countable, \Iterator {
   public function withElement($name, $type) {
     if (is_string($type)) {
       // Create an instance of the element.
-      if (isset(Config::elementMap[$type])) {
-        $class = Config::elementMap[$type];
+      if (isset(Config::$elementMap[$type])) {
+        $class = Config::$elementMap[$type];
         $type = new $class;
       }
       else {
-        throw Villain\Exception('Form element does not exist.');
+        throw new \Villain\Exception('Form element does not exist.');
       }
     }
 

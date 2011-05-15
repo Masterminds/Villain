@@ -34,7 +34,7 @@ class Form extends AbstractElement {
    * Setup a form right out of the gate.
    */
   public function __construct() {
-    $this->collection = new Collectoin();
+    $this->collection = new Collection();
 
     // Set the action to the current url as a default.
     $this->action = $_SERVER['REQUEST_URI'];
@@ -137,7 +137,7 @@ class Form extends AbstractElement {
     }
     else {
       // we have no parent.
-      throw Villain\Exception('Collection is not properly set.');
+      throw \Villain\Exception('Collection is not properly set.');
     }
   }
   

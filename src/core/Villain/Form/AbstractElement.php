@@ -19,7 +19,7 @@ namespace Villain\Form;
  *
  * @author Matt Farina
  */
-class AbstractElement {
+abstract class AbstractElement {
 
   /**
    * The parent collection element.
@@ -126,7 +126,11 @@ class AbstractElement {
     // @todo Switch to the theme system.
     // @todo Escape the label name.
     // Should the label be run through a translation system?
-    return '<label' . $this->renderAttributes($this->buildLabelAttributes()) . '>' . $this->label . "</label>\n";
+    $output = '';
+    if (!is_null($this->label)) {
+      $output = '<label' . $this->renderAttributes($this->buildLabelAttributes()) . '>' . $this->label . "</label>\n";
+    }
+    return $output;
   }
 
   /**

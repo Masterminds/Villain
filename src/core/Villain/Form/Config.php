@@ -21,6 +21,6 @@ class Config {
    * @todo This should be turning into a get/set API.
    */
   public static $elementMap = array(
-    'text' => 'Villain\Form\Textfield',
+    'textfield' => 'Villain\Form\Textfield',
   );
 }
