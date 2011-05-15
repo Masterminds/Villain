@@ -101,6 +101,7 @@ class Collection implements \Countable, \Iterator {
 
     // Attach the element
     $type->hasName($name);
+    $type->setParent($this);
     $this->elements[$name] = $type;
 
     return $this;
