@@ -187,7 +187,7 @@ abstract class AbstractElement {
    * @return AbstractElement
    *   $this for the current element.
    */
-  public function withDescription() {
+  public function withDescription($description) {
     $this->description = $description;
     return $this;
   }

@@ -104,7 +104,7 @@ class Collection implements \Countable, \Iterator {
     $type->setParent($this);
     $this->elements[$name] = $type;
 
-    return $this;
+    return $type;
   }
 
   /**
