@@ -66,10 +66,10 @@ class Collection implements \Countable, \Iterator {
    * @return string
    *   An html string.
    */
-  public function render() {
+  public function __toString() {
     $output = '';
     foreach ($this->elements as $element) {
-      $output .= $element->render() . "\n";
+      $output .= $element . "\n";
     }
     return $output;
   }

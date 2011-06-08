@@ -110,7 +110,7 @@ abstract class AbstractElement {
    * @return string
    *   The html for the form element.
    */
-  public function render() {
+  public function __toString() {
     $output = '<div>'; // @todo Add wrapper id.
     $output .= $this->renderLabel();
     $output .= $this->renderElement();

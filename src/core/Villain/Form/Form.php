@@ -101,9 +101,9 @@ class Form extends AbstractElement {
   /**
    * Render the form.
    */
-  public function render() {
+  public function __toString() {
     $output = '<form' . $this->renderAttributes($this->buildAttributes()) . ">\n";
-    $output .= $this->collection->render();
+    $output .= $this->collection;
     $output .= "</form>\n";
     return $output;
   }
