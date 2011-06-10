@@ -11,6 +11,11 @@ namespace Villain\Theme;
 /**
  * Read a theme INI file and load the theme.
  *
+ * The standard method of building a theme in Fortissimo is to create a subclass of BaseFortissimoCommand.
+ * This is good from a performance standpoint, but a little out of character for a theme builder to have
+ * to know. The LoadThemeFromIni command provides a way of loading a theme from an INI file instead of a
+ * class file.
+ *
  * The file format for theme INIs is this:
  *
  * @code
@@ -30,6 +35,10 @@ namespace Villain\Theme;
  * my.otherClassFunc = MyOtherClass->myMethod($vars)
  * 
  * @endcode
+ *
+ * Notes:
+ * - callback functions cannot be resolved automatically by the autoloader. Make sure they are included.
+ *
  * @author Matt Butcher
  */
 class LoadThemeFromIni extends \BaseFortissimoCommand {
@@ -113,6 +122,11 @@ class LoadThemeFromIni extends \BaseFortissimoCommand {
   }
 }
 
+/**
+ * A helper class for LoadThemeFromIni.
+ *
+ * This builds an ad hoc theme package to represent the contents of an INI file.
+ */
 class IniLoaderThemePackage extends \BaseThemePackage {
   
   protected $ini = array();
