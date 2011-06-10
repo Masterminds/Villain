@@ -29,7 +29,7 @@ Config::group('bootstrap')
 Config::group('renderHTML')
   ->doesCommand('theme_init')
     ->whichInvokes('InitializeTheme')
-    ->withParam('path')->from('cxt:site.theme')->whoseDefaultIs('theme/vanilla')
+    ->withParam('path')->from('cxt:site.theme')->whoseValueIs('theme/vanilla')
 ;
 
 /*
@@ -42,7 +42,12 @@ Config::group('auth')
 
 Config::request('test')
   ->usesGroup('bootstrap')
-  ->doesCommand('dump')->whichInvokes('FortissimoContextDump')
+  ->usesGroup('renderHTML')
+  ->doesCommand('loadTheme')->whichInvokes('Villain\Theme\LoadThemeFromIni')
+    ->withParam('filename')->whoseValueIs('../test/theme_test.ini')
+    
+    
+  //->doesCommand('dump')->whichInvokes('FortissimoContextDump')
 ;
 
 Config::request('login')
