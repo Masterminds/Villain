@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * A test harness that Villain apps can use to debug.
+ */
 
 require_once 'src/Fortissimo.php';
 require_once 'VillainTestCase.php';
