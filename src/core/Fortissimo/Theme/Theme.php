@@ -292,7 +292,7 @@ class ThemeImpl {
    *  TRUE if the target is registered, FALSE otherwise.
    */
   public function has($target) {
-    return isset($this->registry['target']);
+    return isset($this->registry[$target]);
   }
   
   /**
@@ -323,6 +323,9 @@ class ThemeImpl {
     if (isset($this->registry[$target])) {
       $hollaback = $this->registry[$target];
       $buffer = call_user_func($hollaback, $variables);
+    }
+    else {
+      throw new FortissimoException("Theme $target is not in the registry.");
     }
     
     // Postprocess
