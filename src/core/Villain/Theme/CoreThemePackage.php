@@ -22,6 +22,7 @@ class CoreThemePackage extends \BaseThemePackage {
   public function functions() {
     return array(
       //'target' => callback,
+      'form.textfield' => array('Villain\Theme\Form', 'textfield'),
     );
   }
   
