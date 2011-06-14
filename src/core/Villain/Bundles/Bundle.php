@@ -42,6 +42,8 @@ class Bundle {
     
     // Let the bundle configure itself:
     require $bundleName . '/bundle.php';
+    
+    self::manager()->initialize($bundleName);
   }
   
   /**
@@ -56,7 +58,7 @@ class Bundle {
     $spec = new BundleSpecification($bundleName);
     
     // Register the spec with the bunnyman.
-    //$this->manager()->setSpec($spec->getName(), $spec);
+    $this->manager()->addBundle($spec);
     
     return $spec;
   }

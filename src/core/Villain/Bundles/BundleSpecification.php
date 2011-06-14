@@ -142,7 +142,7 @@ class BundleSpecification implements \Villain\Storage\Storable {
    *  The current bundle spec.
    */
   public function provides($virtualBundleName) {
-    $this->virtuals[] = $virtualBundleName;
+    $this->virtuals[$virtualBundleName] = $virtualBundleName;
     return $this;
   }
   
