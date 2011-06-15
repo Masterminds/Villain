@@ -1,7 +1,7 @@
 <?php
 
 // Enable bundle support.
-use \Villain\Bundles;
+use \Villain\Bundles\Bundle;
 
 // Since Villain uses namespaces and a namespace-aware
 // autoloader, you shouldn't have to do this very often.
