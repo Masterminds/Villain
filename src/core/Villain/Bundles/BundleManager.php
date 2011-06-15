@@ -88,6 +88,9 @@ class BundleManager {
    * - Check that the modules are registered
    * - Add the bundle's src/ folder to the include path
    * - Run any necessary initialization code
+   *
+   * @param FortissimoExecutionContext $cxt
+   *  A context.
    */
   public function enable(FortissimoExecutionContext $cxt) {
     

@@ -7,6 +7,9 @@ use \Villain\Bundles;
 // autoloader, you shouldn't have to do this very often.
 Config::includePath('core/Fortissimo/Theme'); // Include the Theme classes, which are optional.
 
+// Include the BasicBlog 
+Bundle::load('BasicBlog');
+
 /*
  * The main storage backend for Villain.
  */
