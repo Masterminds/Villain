@@ -43,7 +43,7 @@ class Bundle {
     // Let the bundle configure itself:
     require $bundleName . '/bundle.php';
     
-    self::manager()->initialize($bundleName);
+    self::manager()->validate($bundleName);
   }
   
   /**

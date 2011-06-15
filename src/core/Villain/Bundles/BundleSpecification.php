@@ -104,7 +104,11 @@ class BundleSpecification implements \Villain\Storage\Storable {
    *  string in this list, then it will be marked incompatible.
    */
   public function dependsOn($otherBundleName, $version = NULL, $maxVersion = NULL, $excludeVersions = array()) {
-    $this->dependencies[$otherBundleName] = $version;
+    $this->dependencies[$otherBundleName] = array(
+      'min' => $version,
+      'max' => $maxVersion,
+      'not' => $excludeVersions,
+    );
     return $this;
   }
   
@@ -155,7 +159,8 @@ class BundleSpecification implements \Villain\Storage\Storable {
    *  This bundle spec.
    */
   public function incompatibleWith($otherBundleName) {
-    $$this->conflicts[$otherBundleName];
+    //$this->conflicts[$otherBundleName] = $otherBundleName;
+    $this->conflicts[] = $otherBundleName;
     return $this;
   }
   
