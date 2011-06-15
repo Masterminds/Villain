@@ -36,7 +36,7 @@ class Bundle {
   public static function load($bundleName, $options = array()) {
     
     // FIXME: I think this check needs to be much stronger.
-    if (empty($bundleName) || preg_match('^[a-zA-Z0-9\.\-_]+$') == 0) {
+    if (empty($bundleName) || preg_match('/^[a-zA-Z0-9\.\-_]+$/', $bundleName) == 0) {
       throw new VillainInterruptException('Bundle must have a valid name.');
     }
     
