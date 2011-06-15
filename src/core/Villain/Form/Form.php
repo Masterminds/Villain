@@ -30,14 +30,18 @@ class Form extends AbstractElement {
    */
   protected $action = null;
   
+  protected $context = null;
+  
   /**
    * Setup a form right out of the gate.
    */
-  public function __construct() {
+  public function __construct(\FortissimoExecutionContext $context) {
     $this->collection = new Collection($this);
 
     // Set the action to the current url as a default.
-    $this->action = $_SERVER['REQUEST_URI'];
+    $this->action = $context->getRequestMapper()->baseURL();;
+    
+    $this->context = $context;
   }
 
   /**

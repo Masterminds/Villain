@@ -28,6 +28,7 @@ class Textfield extends AbstractElement {
    * @see AbstractElement::renderElement()
    */
   public function renderElement() {
-    return '<input' . $this->renderAttributes($this->buildAttributes()) . ">\n";
+    $variables = array('element' => $this);
+    return \Theme::render('form.textfield', $variables);
   }
 }
