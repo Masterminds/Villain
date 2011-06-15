@@ -134,7 +134,7 @@ class BundleManager {
           $name, 
           $ver,
           $spec->getName(), 
-          $version['min'], 
+          $version['min']
         ));
       }
       
@@ -145,7 +145,7 @@ class BundleManager {
           $name, 
           $ver,
           $spec->getName(), 
-          $version['max'], 
+          $version['max']
         ));
       }
       
@@ -157,7 +157,7 @@ class BundleManager {
               '%s %s is incompatible with %s.', 
               $name, 
               $ver,
-              $spec->getName(), 
+              $spec->getName()
             ));
           }
         }

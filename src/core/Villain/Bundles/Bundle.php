@@ -58,7 +58,7 @@ class Bundle {
     $spec = new BundleSpecification($bundleName);
     
     // Register the spec with the bunnyman.
-    $this->manager()->addBundle($spec);
+    self::manager()->addBundle($spec);
     
     return $spec;
   }
