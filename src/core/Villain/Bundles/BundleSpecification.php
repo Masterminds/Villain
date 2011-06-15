@@ -176,7 +176,7 @@ class BundleSpecification implements \Villain\Storage\Storable {
     );
   }
   // For Storable
-  public function fromArray($arr) {
+  public function fromArray(array $arr) {
     $this->name = $arr['name'];
     $this->version = $arr['version'];
     $this->description = $arr['description'];
