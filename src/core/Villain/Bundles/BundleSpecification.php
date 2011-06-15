@@ -69,6 +69,7 @@ class BundleSpecification implements \Villain\Storage\Storable {
    */
   public function description($summary) {
     $this->description = $summary;
+    return $this;
   }
   
   /**
