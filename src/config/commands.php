@@ -101,7 +101,7 @@ Config::request('default')
 Config::request('@create-bundle')
   ->doesCommand('create')
   ->whichInvokes('\Villain\Bundles\ScaffoldNewBundle')
-  ->withParam('name')->from('arg:1')
+  ->withParam('name')->from('arg:2')
 ;
 
 
