@@ -60,6 +60,12 @@
  */
 
 /**
+ * @defgroup VillainBundles Villain Bundles
+ *
+ * Bundles are Villain's system for building extensions.
+ */
+
+/**
  * The main Villain namespace.
  * @ingroup VillainCore
  */

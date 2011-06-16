@@ -61,12 +61,16 @@ class BundleManager {
    *
    * @param string $bundleName
    *  The name of the bundle.
+   * @param boolean $force
+   *  Under rare cases, it may be desirable to force a load even if 
+   *  conflicts or dependencies are not met. If this is TRUE, such 
+   *  will be the case. USE WITH GREAT CAUTION.
    * @throws \Villain\Exception
    *  Is thrown if...
    *  - dependencies aren't met
    *  - conflicts are encountered
    */
-  public function validate($bundleName) {
+  public function validate($bundleName, $force = FALSE) {
     if(!$this->has($bundleName)) {
       throw new \Villain\Exception('No bundle named ' . $bundleName);
     }
@@ -74,9 +78,12 @@ class BundleManager {
     $spec = $this->bundles[$bundleName];
     
     // Check dependencies, virtuals, and conflicts.
-    $this->checkDependencies($spec);
-    $this->checkVirtuals($spec);
-    $this->checkConflicts($spec);
+    if (!$force) {
+      $this->checkDependencies($spec);
+      $this->checkVirtuals($spec);
+      $this->checkConflicts($spec);
+    }
+    
   }
   
   /**

@@ -47,7 +47,8 @@ class Bundle {
    *  The name of the bundle to add.
    * @param array $options
    *   Options to control execution of the bundle.
-   *
+   *   - force: If this option is set, dependency and version checks will be skipped. DANGEROUS and UNSTABLE.
+   *   - no-commands: If this is set to TRUE, then the bundle's commands.php file will not be loaded.
    */
   public static function load($bundleName, $options = array()) {
     
@@ -55,10 +56,25 @@ class Bundle {
       throw new \Villain\InterruptException(sprintf('Bundle %s must have a valid name.', $bundleName));
     }
     
-    // Let the bundle configure itself:
-    require self::DIR . $bundleName . '/bundle.php';
+    $bundlePath = self::DIR . $bundleName;
     
-    self::manager()->validate($bundleName);
+    // Let the bundle configure itself:
+    require $bundlePath . '/bundle.php';
+    
+    // Validate the bundle
+    $force = isset($options['force']) ? $options['force'] : FALSE;
+    self::manager()->validate($bundleName, $force);
+    
+    // Add the bundle's code to the classpath.
+    if (is_dir($bundlePath . '/src')) {
+      \Config::includePath($bundlePath . '/src');
+    }
+    
+    // Execute the bundle's commands.php if it exists.
+    $noCMD = isset($options['no-commands']) ? $options['no-commands'] : FALSE;
+    if (!$noCMD && is_file($bundlePath . '/commands.php')) {
+      require $bundlePath . '/commands.php';
+    }
   }
   
   /**
