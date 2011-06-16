@@ -16,10 +16,26 @@ namespace Villain\Bundles;
  */
 class Bundle {
   
+  const DIR = 'bundles/';
+  
   /**
    * The bundle manager.
    */
   protected static $bunnyman = NULL;
+  
+  /**
+   * Test whether a bundle name is valid.
+   *
+   * Currently, valid bundle names are composed of a-z, A-Z, 0-9, - and _.
+   *
+   * @param string $bundleName
+   *  The name of a bundle.
+   * @return boolean
+   *  TRUE if this name is valid, FALSE otherwise.
+   */
+  public static function isValidName($bundleName) {
+    return !(empty($bundleName) || preg_match('/^[a-zA-Z0-9\.\-_]+$/', $bundleName) == 0);
+  }
   
   /**
    * Use a bundle.
@@ -35,13 +51,12 @@ class Bundle {
    */
   public static function load($bundleName, $options = array()) {
     
-    // FIXME: I think this check needs to be much stronger.
-    if (empty($bundleName) || preg_match('/^[a-zA-Z0-9\.\-_]+$/', $bundleName) == 0) {
-      throw new VillainInterruptException('Bundle must have a valid name.');
+    if (!self::isValidName($bundleName)) {
+      throw new \Villain\InterruptException(sprintf('Bundle %s must have a valid name.', $bundleName));
     }
     
     // Let the bundle configure itself:
-    require 'bundles/' . $bundleName . '/bundle.php';
+    require self::DIR . $bundleName . '/bundle.php';
     
     self::manager()->validate($bundleName);
   }

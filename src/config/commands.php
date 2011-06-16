@@ -96,6 +96,16 @@ Config::request('default')
 ;
 
 /*
+ * Internal commands.
+ */
+Config::request('@create-bundle')
+  ->doesCommand('create')
+  ->whichInvokes('\Villain\Bundles\ScaffoldNewBundle')
+  ->withParam('name')->from('arg:1')
+;
+
+
+/*
  */
 Config::logger('foil')
   ->whichInvokes('FortissimoOutputInjectionLogger')

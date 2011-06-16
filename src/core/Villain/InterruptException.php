@@ -2,7 +2,7 @@
 /** @file
  * This file holds the fatal InterruptException.
  */
-namespace \Villain;
+namespace Villain;
 
 /**
  * A fatal exception.
@@ -10,4 +10,4 @@ namespace \Villain;
  * This is thrown for exception conditions that are grave enough
  * to stop processing.
  */
-class InterruptException extends FortissimoInterruptException {}
+class InterruptException extends \FortissimoInterruptException {}

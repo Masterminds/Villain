@@ -176,6 +176,7 @@ class BundleSpecification implements \Villain\Storage\Storable {
       'conflicts' => $this->conflicts,
     );
   }
+  
   // For Storable
   public function fromArray(array $arr) {
     $this->name = $arr['name'];
