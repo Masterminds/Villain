@@ -8,7 +8,7 @@ Config::group('blogSetup')
   ->doesCommand('setupBlogTheme')
     ->whichInvokes('InitializeTheme')
     ->withParam('register')->whoseValueIs(array('\BasicBlog\Theme\BlogTheme'))
-    ->withParam('path')->whoseValueIs('bundles/BasicBlog/media')
+    ->withParam('path')->whoseValueIs('bundles/BasicBlog/theme')
 ;
 
 Config::request('blog')
