@@ -99,9 +99,30 @@ Config::request('default')
  * Internal commands.
  */
 Config::request('@create-bundle')
+
+  //->doesCommand('arguments')
+
   ->doesCommand('create')
   ->whichInvokes('\Villain\Bundles\ScaffoldNewBundle')
   ->withParam('name')->from('arg:2')
+;
+
+Config::request('@test')
+  ->doesCommand('arguments')
+  ->whichInvokes('\Villain\CLI\ParseOptions')
+  ->withParam('optionSpec')
+  ->whoseValueIs(array(
+    '--test' => array(
+      'help' => 'This is a test option',
+      'value' => TRUE,
+    ),
+    '--help' => array(
+      'help' => 'Print help text for this command.',
+      'value' => FALSE,
+    ),
+  ))
+  ->withParam('offset')->whoseValueIs(1)
+  ->doesCommand('dump')->whichInvokes('FortissimoContextDump')
 ;
 
 

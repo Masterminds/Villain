@@ -37,24 +37,48 @@ namespace Villain\CLI;
  * This command is designed to take a specifications array that specifies which options are supported, and then
  * parse out the args, inserting the parsed args into the context.
  *
- * In the example above, assuming that both a and b are legitimate flags, this would insert two entries into the 
- * context: `$cxt->add('a', 'foo'); $cxt->add('b', 'bar');`. Any trailing data (e.g. not part of the parsed options)
- * will be returned as the return value for this command. So if this command is named `baz`, then the data will be 
- * accessible as `$cxt->get('baz')`. Given this, you will be able to parse commands like this:
- *
+ * Here's how this command could handle the args above:
  * @code
- * $ fort --no-internals myCommand --a foo --b bar SomeOtherData
+ * <?php
+ * Config::request('@test')
+ *   ->doesCommand('arguments')
+ *   ->whichInvokes('\Villain\CLI\ParseOptions')
+ *   ->withParam('optionSpec')
+ *   ->whoseValueIs(array(
+ *     '--a' => array(
+ *       'help' => 'This is a test option',
+ *       'value' => TRUE,
+ *     ),
+ *     '--b' => array(
+ *       'help' => 'This is a test option',
+ *       'value' => TRUE,
+ *     ),
+ *     // Adding this gives us automatic support for the help system.
+ *     '--help' => array(
+ *       'help' => 'Print help text for this command.',
+ *       'value' => FALSE,
+ *     ),
+ *   ))
+ *   ->withParam('offset')->whoseValueIs(1)
+ * ?>
  * @endcode
  *
- * In this example, three values are inserted into the context: a, b, and the command results for this command. So if the
- * command is named `baz`, then the context will contain:
- *
+ * In the example above, assuming that both a and b are legitimate flags, this would insert following entries into the 
+ * context: 
+ * 
  * @code
- * fort SomeOtherData
+ * <?php
+ * array(
+ *   'a' => 'foo',
+ *   'b' => 'bar',
+ *   'arguments-command' => 'myCommand',
+ * );
+ * ?>
  * @endcode
  *
- * Note that the initial Fort call (or whatever the command call is named) will be returned to simulate the normal
- * contents of argv.
+ * Note that the command-line's command name (myCommand) is extracted and pushed into the context with the key being
+ * a concatenation of 'arguments' from doesCommand('arguments') and the word '-command'. If additional data is found after
+ * the options, it is passed back using the command name and '-extra' (e.g. 'myCommand-arguments')
  *
  * It should be possible to recurse, provided that there is a delimiter between flags. `--` will stop this parser from
  * continuing. Unknown flags will generate a \Villain\Exception.
@@ -78,17 +102,24 @@ namespace Villain\CLI;
  *
  * @author Matt Butcher
  */
-class ParseOptions extends BaseFortissimoCommand {
+class ParseOptions extends \BaseFortissimoCommand {
 
   public function expects() {
     return $this
       ->description('Parse an option string, typically from ARGV.')
+      
       ->usesParam('options', 'The array of values to parse. If none is supplied, ARGV is used.')
+      
       ->usesParam('optionSpec', 'An option spec array. See the code documentation for the correct format.')
       ->whichIsRequired()
-      ->usesParam('help', 'Display help instead of processing the arguments.')
-      ->withFilter('boolean')
-      ->whichHasDefault(FALSE)
+      
+      ->usesParam('offset', 'By default, this assumes the first argument is the command. If this is not the case (e.g. if argv is "fort myCommand --foo") set the offset accordingly (1, in this case)')
+      ->whichHasDefault(0)
+      
+      ->usesParam('help', 'Additional help text that will be printed when --help is specified. Normally, minimal help text is generated automatically when --help is in the optionSpec and in the options.')
+      ->withFilter('string')
+      ->whichHasDefault('')
+      
       ->andReturns('The remaining (unprocessed) values. Any parsed options are placed directly into the context.')
     ;
   }
@@ -97,23 +128,35 @@ class ParseOptions extends BaseFortissimoCommand {
     $optionSpec = $this->param('optionSpec');
     $help = $this->param('help');
     $argArray = $this->param('options', NULL);
+    $offset = $this->param('offset', 0);
     
-    if($help) {
-      return $this->generateHelp($optionSpec);
-    }
-    
+    // If no arg array is specified, use ARGV.
     if (!isset($argArray)) {
       global $argv;
       $argArray = $argv;
     }
-    
-    
-    
-    if (!empty($argArray)) {
-      $argArray = $this->extractOptions($optionSpec, $argArray);
+
+    // Shift off leading values.
+    if ($offset > 0) {
+      $argArray = array_slice($argArray, $offset);
     }
     
-    return $argArray;
+    if (!empty($argArray)) {
+      $options = $this->extractOptions($optionSpec, $argArray);
+    }
+    
+    print_r($options);
+    
+    // What do we do with leading args?
+    //print_r($this->leadingArgs);
+    
+    if (isset($options['help'])) {
+      $this->generateHelp($optionSpec, $options);
+    }
+    
+    $this->context->addAll($options);
+    
+    return TRUE;
   }
   
   /**
@@ -132,59 +175,68 @@ class ParseOptions extends BaseFortissimoCommand {
    *  value TRUE.
    */
   public function extractOptions(array $optionSpec, array $args) {
-    //$modifiers = array();
-    $endOpts = 1;
-    $count = count($args);
-
-    for ($i = 1; $i < $count; ++$i) {
-      if (isset($optionSpec[$args[$i]])) {
-        $flag = substr($args[$i], 2);
-
-        // If option needs a value...
-        if ($optionSpec[$args[$i]]['value']) {
-          if (!isset($args[$i + 1])) {
-            throw new \Villain\Exception($args[$i] . ' requires a valid value.');
+    $keep_going = TRUE;
+    $buffer = array();    
+    $command = array_shift($args);
+    
+    // Loop through all of hte flags.
+    while ($keep_going && $flag = array_shift($args)) {
+      if (isset($optionSpec[$flag])) {
+        $key = substr($flag, 2);
+        if($optionSpec[$flag]['value']) {
+          $value = array_shift($args);
+          if (!isset($value) || strpos($value, '--') === 0) {
+            throw new \Villain\Exception($flag . ' requires a valid value.');
           }
-          //$modifiers[$flag] = $args[++$i];
-          $this->context->add($flag, $args[++$i]);
+          $buffer[$key] = $value;
         }
-        // Option doesn't need a value
         else {
-          //$modifiers[$flag] = TRUE;
-          $this->context->add($flag, TRUE);
+          $buffer[$key] = TRUE;
         }
-        $endOpts = $i + 1;
       }
-      // Stop if we hit --
-      elseif ($args[$i] == '--') {
-        $endOpts = ++$i;
-        break;
+      elseif($flag == '--') {
+        $keep_going = FALSE;
       }
-      // Fail if we hit unknown option
-      elseif (strpos($args[$i], '--') === 0) {
-        throw new \Villain\Exception(sprintf("Unrecognized option %s.", $args[$i]));
+      elseif(strpos($flag, '--') === 0) {
+        throw new \Villain\Exception(sprintf("Unrecognized option %s.", $flag));
       }
-      // Looks like we're done.
       else {
-        $endOpts = $i;
-        break;
+        array_unshift($args, $flag);
+        $keep_going = FALSE;
       }
     }
+    $buffer[$this->name . '-command'] = $command;
+    $buffer[$this->name . '-extra'] = $args;
     
-    // Now we splice the parsed options out of args
-    $ret = array_splice($args, 1, $endOpts - 1);
-
-    return $ret;
+    return $buffer;
   }
   
-  public function generateHelp($optionSpec) {
+  /**
+   * Generate help text.
+   *
+   * @param array $optionSpec
+   *  The option spec array.
+   * @param array $options
+   *  The array of options, as parsed by extractOptions().
+   * @param string $extraHelp
+   *  Any help text based as 'help' to this command.
+   * @throws \FortissimoInterrupt
+   *  Always thrown to stop execution.
+   */
+  public function generateHelp($optionSpec, $options, $extraHelp = '') {
     $buffer = array();
-    $format = '%s:  %s';
+    $format = "\t%s:  %s" . PHP_EOL;
+    
+    printf('%s supports the following' . PHP_EOL, $options[$this->name . '-command']);
     foreach ($optionSpec as $flag => $spec) {
       $help = isset($spec['help']) ? $spec['help'] : '(undocumented)';
-      $buffer[] = sprintf($format, $flag, $help);
+      printf($format, $flag, $help);
     }
-    return $buffer;
+    if (!empty($extraHelp)) {
+      print $extraHelp . PHP_EOL;
+    }
+    print PHP_EOL;
+    throw new \FortissimoInterrupt();
   }
 }
 
