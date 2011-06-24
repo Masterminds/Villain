@@ -107,6 +107,31 @@ Config::request('@create-bundle')
   ->withParam('name')->from('arg:2')
 ;
 
+/*
+Config::request('@install-bundle')
+  ->doesCommand('arg')
+    ->whichInvokes('\Villain\CLI\ParseOptions')
+    ->withParam('optionSpec')
+    ->whoseValueIs(array(
+      '--all' => array(
+        'help' => 'Try to ',
+        'value' => TRUE,
+      ),
+      '--help' => array(
+        'help' => 'Print help text for this command.',
+        'value' => FALSE,
+      ),
+    ))
+  ->withParam('offset')->whoseValueIs(1)
+  
+  //->doesCommand('install')
+  
+;
+
+Config::request('@uninstall-bundle')
+;
+*/
+
 Config::request('@test')
   ->doesCommand('arguments')
   ->whichInvokes('\Villain\CLI\ParseOptions')
