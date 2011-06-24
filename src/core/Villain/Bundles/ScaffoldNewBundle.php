@@ -70,14 +70,29 @@ class ScaffoldNewBundle extends \BaseFortissimoCommand {
     return $path;
   }
   
-  protected function createBundleSubdirectories($path) {
-    mkdir($path . '/src');
-    mkdir($path . '/test');
-    mkdir($path . '/doc');
-    mkdir($path . '/media');
-    mkdir($path . '/media/css');
-    mkdir($path . '/media/img');
-    mkdir($path . '/media/js');
+  /**
+   * Create the standard base directories and protect those that need it.
+   */
+  protected function createBundleSubdirectories($basePath) {
+    
+    $paths = array(
+      '/src' => TRUE,
+      '/test' => FALSE,
+      '/doc' => FALSE,
+      '/media' => TRUE,
+      '/media/css' => TRUE,
+      '/media/img' => TRUE,
+      '/media/js' => TRUE,
+      '/theme' => FALSE,
+    );
+    
+    foreach ($paths as $path => $allow_browser_access) {
+      $fullPath = $basePath . $path;
+      mkdir($fullPath);
+      if (!$allow_browser_access) {
+        $this->addHTAccess($fullPath);
+      }
+    }
   }
   
   protected function createBundlePHP($path, $name) {
@@ -92,6 +107,16 @@ Bundle::create('$name')
 EOF;
     $f = fopen($path . '/bundle.php', 'w');
     fwrite($f, $code);
+    fclose($f);
+  }
+  
+  /**
+   * Add an .htaccess file to a path.
+   */
+  protected function addHTAccess($directory) {
+    $htaccess = 'Order Allow,Deny';
+    $f = fopen($directory . '/.htaccess', 'w');
+    fwrite($f, $htaccess);
     fclose($f);
   }
 }
