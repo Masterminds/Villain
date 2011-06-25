@@ -32,7 +32,14 @@ class IntegerField {
   }
 
   public function validate($value) {
-    throw new FieldValidationException('Not implemented.')
+    $options = array();
+    if (isset($this->min)) {
+      $options['options']['min_range'] = $this->min;
+    }
+    if (isset($this->max)) {
+      $options['options']['max_range'] = $this->max;
+    }
+    return filter_var($value, FILTER_VALIDATE_INT, $options) !== FALSE;
   }
   
   public function getDefinition() {
