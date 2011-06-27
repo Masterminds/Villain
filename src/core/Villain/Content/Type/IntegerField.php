@@ -42,6 +42,10 @@ class IntegerField {
     return filter_var($value, FILTER_VALIDATE_INT, $options) !== FALSE;
   }
   
+  public function normalize($value) {
+    return (int)$value;
+  }
+  
   public function getDefinition() {
     $def = parent::getDefinition();
     $def['min'] = $min;

@@ -30,4 +30,7 @@ class BooleanField extends Field {
   public function validate($value) {
     return filter_var($value, FILTER_VALIDATE_BOOLEAN);
   }
+  public function normalize($value) {
+    return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+  }
 }

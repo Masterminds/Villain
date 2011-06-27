@@ -111,6 +111,29 @@ abstract class Field {
   public function getMinRepeat() {
     return $this->min_repeat;
   }
+  
+  /**
+   * Normalize the field value.
+   *
+   * While validate() checks whether the given value is allowed, normalize
+   * converts the data into it's normal form. For example, while the string 'TRUE' may count
+   * as a valid boolean value, its normalized form is a boolean TRUE. Similarly, while
+   * the string '123' is an integer, its normal form is the integer 123.
+   *
+   * By default, normalize() returns the value unaltered, but various fields may override 
+   * this to provide a normal representation of their field's value.
+   *
+   * normalize() should not be called before validate().
+   *
+   * @param mixed $value
+   *  The value to normalize.
+   * @return mixed
+   *  The normal form of the value.
+   */
+  public function normalize($value) {
+    return $value;
+  }
+  
   /**
    * Validate the field.
    * @throws FieldValidationException if the field does not validate.
