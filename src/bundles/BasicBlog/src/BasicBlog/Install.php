@@ -8,6 +8,13 @@
 
 namespace BasicBlog;
 
+use \Villain\Content\Type\StringField;
+use \Villain\Content\Type\IntegerField;
+use \Villain\Content\Type\BooleanField;
+use \Villain\Content\Type\TimestampField;
+use \Villain\Content\Type\MongoIdField;
+use \Villain\Content\Type\TypeDefinition;
+
 /**
  * A Fortissimo command.
  *
@@ -27,7 +34,7 @@ class Install extends BaseFortissimoCommand {
       //->withFilter('string')
       //->whichIsRequired()
       //->whichHasDefault('some value')
-      ->andReturns('')
+      ->andReturns('Nothing.')
     ;
   }
 
@@ -37,7 +44,7 @@ class Install extends BaseFortissimoCommand {
   }
   
   protected function addBlogContentType() {
-    $type = new \Villain\Content\Type\TypeDefinition($this->blogName, $this->blogLabel);
+    $type = new TypeDefinition($this->blogName, $this->blogLabel);
     
     // Add the title field.
     $title = new StringField('title', 'Title');
@@ -74,6 +81,9 @@ class Install extends BaseFortissimoCommand {
     $updatedOn = new TimestampField('updatedOn', 'Updated on');
     $updatedOn->setDescription('The last time this blog was updated.');
     
+    $createdBy = new MongoIdField('createdBy', 'Created by');
+    $createdBy->setDescription('The user who created this content.')
+    
     $type->addField($title);
     $type->addField($subtitle);
     $type->addField($description);
@@ -82,14 +92,7 @@ class Install extends BaseFortissimoCommand {
     $type->addField($showFullArticle);
     $type->addField($createdOn);
     $type->addField($updatedOn);
-    
-    
-    
-    $createdBy
-    
-    
-    
-    
+    $type->addField($createdBy);
     
   }
   protected function addBlogEntryContentType() {}
