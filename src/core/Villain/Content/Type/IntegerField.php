@@ -9,7 +9,7 @@ namespace Villain\Content\Type;
 /**
  * An IntegerField describes a Field for a TypeDefinition.
  */
-class IntegerField {
+class IntegerField extends Field {
   
   protected $min = NULL;
   protected $max = NULL;
@@ -43,7 +43,7 @@ class IntegerField {
   }
   
   public function normalize($value) {
-    return (int)$value;
+    return (int)filter_var($value, FILTER_SANITIZE_NUMBER_INT);
   }
   
   public function getDefinition() {

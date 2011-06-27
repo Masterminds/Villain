@@ -14,7 +14,7 @@ namespace Villain\Content\Type;
  * For example, a list member field with the list array(1, 2, 7) will only successfully validate
  * when given one of the three integers 1, 2, or 7.
  */
-class ListMemberField {
+class ListMemberField extends Field {
   protected $list = array();
   
   /**

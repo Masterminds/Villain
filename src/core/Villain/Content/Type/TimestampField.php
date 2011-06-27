@@ -73,4 +73,8 @@ class TimestampField extends IntegerField {
     
   }
   
+  public function normalize($value) {
+    return strtotime($value);
+  }
+  
 }
