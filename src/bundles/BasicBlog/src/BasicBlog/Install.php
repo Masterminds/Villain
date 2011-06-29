@@ -13,6 +13,7 @@ use \Villain\Content\Type\IntegerField;
 use \Villain\Content\Type\BooleanField;
 use \Villain\Content\Type\TimestampField;
 use \Villain\Content\Type\MongoIdField;
+use \Villain\Content\Type\ListMemberField;
 use \Villain\Content\Type\TypeDefinition;
 
 /**
@@ -95,6 +96,46 @@ class Install extends BaseFortissimoCommand {
     $type->addField($createdBy);
     
   }
-  protected function addBlogEntryContentType() {}
+  protected function addBlogEntryContentType() {
+    $type = new TypeDefinition($this->blogEntryName, $this->blogEntryLabel);
+    
+    
+    $title = new StringField('title', 'Title');
+    $title->setDescription('The title of the blog.');
+    $title->setMaxLenght(128);
+    
+    $lede = new StringField('lede', 'Lede');
+    $lede->setDescription('The intro paragraph or teaser paragraph for this entry.');
+    
+    $tags = new StringField('tags', 'Tags');
+    $tags->setDescription('One or more tags describing this post.');
+    // Allow the field to repeat indefinitely.
+    $tags->repeats(-1);
+    
+    $workflowState = new ListMemberField('workflowState', 'Workflow State');
+    $workflowState->acceptedValues(array('draft', 'published', 'unpublished'));
+    
+    $body = new StringField('body', 'Body');
+    $body->setDescription('The body of the blog post.');
+    
+    $createdOn = new TimestampField('createdOn', 'Created on');
+    $createdOn->setDescription('The date upon which this blog entry was created.');
+    
+    $updatedOn = new TimestampField('updatedOn', 'Updated on');
+    $updatedOn->setDescription('The last time this blog entry was updated.');
+    
+    $createdBy = new MongoIdField('createdBy', 'Created by');
+    $createdBy->setDescription('The user who created this content.')
+    
+    $type->addField($title);
+    $type->addField($lede);
+    $type->addField($tags);
+    $type->addField($body);
+    $type->addField($workflowState);
+    $type->addField($createdOn);
+    $type->addField($updatedOn);
+    $type->addField($createdBy);
+    
+  }
 }
 
