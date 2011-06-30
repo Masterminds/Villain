@@ -90,7 +90,7 @@ class FilterManager {
    */
   public function addChain($name, $filters, $overwrite = TRUE) {
     
-    $chain = $this->filterColelction->findOne(array('name' => $name));
+    $chain = $this->filterCollection->findOne(array('name' => $name));
     
     if (empty($chain)) {
       $chain = array(
@@ -104,9 +104,8 @@ class FilterManager {
     else {
       throw new \Villain\Exception(sprintf('A chain named %s already exists.', $name));
     }
-    
     $this->filterCollection->save($chain);
-    
+    $this->filterCollection->ensureIndex(array('name'));
   }
   
   /**

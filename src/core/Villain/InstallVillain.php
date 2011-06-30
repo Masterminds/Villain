@@ -5,13 +5,13 @@
  *
  * Created by Matt Butcher on 2011-06-29.
  */
-
+namespace Villain;
 /**
  * A Fortissimo command.
  *
  * @author Matt Butcher
  */
-class InstallVillain extends BaseFortissimoCommand {
+class InstallVillain extends \BaseFortissimoCommand {
 
   public function expects() {
     return $this
@@ -35,7 +35,7 @@ class InstallVillain extends BaseFortissimoCommand {
     $filterManager = $this->context('filters');
     
     $safeHTML = array(
-      '\Villain\Filters\WhitelistTagFilter' => array(),
+      '\Villain\Filters\WhitelistTagFilter' => NULL,
     );
     $safeASCII = array(
       '\Villain\Filters\PlaintextFilter' => NULL,
@@ -44,9 +44,9 @@ class InstallVillain extends BaseFortissimoCommand {
       '\Villain\Filters\EscapeMarkupFilter' => NULL,
     );
     
-    $filterManager->addFilter('safeHTML', $safeHTML);
-    $filterManager->addFilter('safeASCII', $safeASCII);
-    $filterManager->addFilter('plain', $plain)
+    $filterManager->addChain('safeHTML', $safeHTML);
+    $filterManager->addChain('safeASCII', $safeASCII);
+    $filterManager->addChain('plain', $plain);
   }
 }
 
