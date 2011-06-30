@@ -77,21 +77,34 @@ class CreateBlogContent extends \BaseFortissimoCommand {
     $clean = filter_var($title, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH);
     $len = strlen($clean);
     if ($len > 255) {
-      throw new \FortissimoException("Title is too long");
+      throw new \Villain\Exception("Title is too long");
     }
     if ($len == 0) {
-      throw new \FortissimoException("Title is required");
+      throw new \Villain\Exception("Title is required");
     }
     return $clean
   }
 
   public function doCommand() {
-
-    // $myParam = $this->param('myParam', 'Default value');
-    // $myCxt = $this->context('myContext', 'Default value');
-
-
-    // return $result; // Insert into Context.
+    // No real munging happens, so we might as well return just the validated data.
+    return $this->parameters;
+    
+    /*
+    $data = array(
+      'descriptionFilter' => $this->param('descriptionFilter'),
+      'title' => $this->param('title'),
+      'subtitle' => $this->param('subtitle'),
+      'description' => $this->param('description'),
+      'footer' => $this->param('footer'),
+      'entriesPerPage' => $this->param('entriesPerPage'),
+      'showFullArticle' => $this->param('showFullArticle'),
+      'createdOn' => $this->param('createdOn'),
+      'createdBy' => $this->param('createdBy'),
+      'updatedOn' => $this->param('updatedOn'),
+    );
+    
+    return $data;
+    */
   }
 }
 
