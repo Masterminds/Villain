@@ -26,8 +26,11 @@ Config::datasource('db') // Name of datasource
  * Just about every page should bootstrap.
  */
 Config::group('bootstrap')
-  ->doesCommand('config')->whichInvokes('Villain\Configuration\AddIniToContext')
+  ->doesCommand('config')->whichInvokes('\Villain\Configuration\AddIniToContext')
     ->withParam('filename')->whoseValueIs('config/villain.ini')
+  ->doesCommand('filters')
+    ->whichInvokes('\Villain\Filters\InitializeFilters')
+    ->withParam('collection')->whoseValueIs('filters')
   //->doesCommand('some_command')->whichInvokes('SomeCommandClass')
   //->doesCommand('some_other_command')->whichInvokes('SomeOtherCommandClass')
 ;
