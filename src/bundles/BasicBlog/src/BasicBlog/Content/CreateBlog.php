@@ -29,6 +29,10 @@ class CreateBlog extends \BaseFortissimoCommand {
       ->withFilter('string', FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH)
       ->whichHasDefault('')
       
+      ->usesParam('shortName', 'The short, computer-friendly name (mnemonic) of this blog. Used in URLs and other places. Valid characters: a-z, A-Z, 0-9, and -.')
+      ->withFilter('validate_regexp', array('options' => array('regexp' => '/^[a-zA-Z0-9\-]+$/')))
+      ->whichIsRequired()
+      
       ->usesParam('descriptionFilter', 'The filter chain applied to the description')
       ->withFilter('string')
       ->whichHasDefault('safeHTML')
@@ -50,12 +54,12 @@ class CreateBlog extends \BaseFortissimoCommand {
       ->withFilter('boolean')
       
       ->usesParam('createdOn', 'The date/time this was created. Can be a timestamp or anything parseable with strtotime.')
-      ->withFilter('callback', 'strtotime')
-      ->whichHasDefault(FORTISSIMO_REQ_TIME)
+      ->withFilter('callback', '\Villain\Util\CommandFilters::sanitizeDate')
+      ->whichHasDefault('@' . FORTISSIMO_REQ_TIME)
       
       ->usesParam('updatedOn', 'The date/time this was updated. Can be a timestamp or anything parseable with strtotime.')
-      ->withFilter('callback', 'strtotime')
-      ->whichHasDefault(FORTISSIMO_REQ_TIME)
+      ->withFilter('callback', '\Villain\Util\CommandFilters::sanitizeDate')
+      ->whichHasDefault('@' . FORTISSIMO_REQ_TIME)
       
       ->usesParam('createdBy', 'The username of the user who created this.')
       ->withFilter('string')
