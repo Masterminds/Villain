@@ -46,7 +46,7 @@ class WhitelistTagFilter {
     // transformed into tags (e.g. <script<sneaky>> becomming <script>).
     $regex = '/(<([\/]?)(' . $whites . ')\b[^>\/]*([\/]?)>)|(<[\/]?([\w]+)[^>]*>)|[><]+/i';
     
-    $result = preg_replace_callback($regex, array($thism 'pregReplaceCallback'), $test);
+    $result = preg_replace_callback($regex, array($this, 'pregReplaceCallback'), $value);
 
     return $result;
   }

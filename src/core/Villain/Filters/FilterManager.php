@@ -66,7 +66,7 @@ class FilterManager {
     
     $chainList = $filterChain['chain'];
     
-    return $this->runChain($filterChain, $value, $options);
+    return $this->runChain($chainList, $value, $options);
   }
   
   /**
@@ -159,7 +159,7 @@ class FilterManager {
   /**
    * Run the given chain against the supplied value.
    */
-  protected function runChains($chain, $value) {
+  protected function runChain($chain, $value) {
     foreach ($chain as $filterKlass => $args) {
       $obj = new $filterKlass($args);
       $value = $obj->run($value);
