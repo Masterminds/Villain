@@ -52,7 +52,7 @@ abstract class AbstractContentCommand extends \BaseFortissimoCommand {
       $mongo = $this->context->ds($ds)->get();
     }
 
-    $collection = $mongo->useCollection($this->param('collection', self::DEFAULT_COLLECTION));
+    $collection = $mongo->selectCollection($this->param('collection', self::DEFAULT_COLLECTION));
     
     return $collection;
   }
