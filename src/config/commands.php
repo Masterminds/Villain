@@ -157,9 +157,48 @@ Config::request('@test')
     ),
   ))
   ->withParam('offset')->whoseValueIs(1)
+  
+  ->doesCommand('prompts')
+  ->whichInvokes('\Villain\CLI\ReadLine')
+  ->withParam('prompts')
+  ->whoseValueIs(array(
+    'first name' => array(
+      'help' => 'What is your first name?',
+      'default' => 'Anonymous',
+    ),
+    'last name' => array(
+      'help' => 'What is your last name?',
+    ),
+  ))
+  
+  //->doesCommand('echo')->whichInvokes('\FortissimoEcho')->whoseDefaultIs()
   ->doesCommand('dump')->whichInvokes('FortissimoContextDump')
 ;
 
+Config::request('@create-blog')
+  ->usesGroup('bootstrap')
+  ->doesCommand('input')
+    ->whichInvokes('\Villain\CLI\Readline')
+    ->withParam('prompts')
+    ->whoseValueIs(array(
+      'title' => array('help' => 'The title of the blog.'),
+      'description' => array('help' => 'What the blog is about.'),
+      'entries' => array('help' => 'Entries per page (10).', 'default' => 10),
+      'createdBy' => array('help' => 'Username of user who created this.'),
+      'url' => array('help' => 'Base URL.', 'default' => 'blog'),
+    ))
+  ->doesCommand('createBlog')
+    ->whichInvokes('BasicBlog\Content\CreateBlog')
+    ->withParam('title')->from('cxt:title')
+    ->withParam('description')->from('cxt:description')
+    ->withParam('entriesPerPage')->from('cxt:entries')
+    ->withParam('createdBy')->from('cxt:createdBy')
+    ->withParam('shortName')->from('cxt:url')
+  ->doesCommand('save')
+    ->whichInvokes('\Villain\Content\SaveContent')
+    ->withParam('content')->from('cxt:createBlog')
+    ->withParam('collection')->whoseValueIs('blog')
+;
 
 /*
  */
