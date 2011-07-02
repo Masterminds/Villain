@@ -13,7 +13,7 @@ namespace BasicBlog;
  *
  * @author Matt Butcher
  */
-class Install extends BaseFortissimoCommand {
+class Install extends \BaseFortissimoCommand {
 
   private $blogName = 'BasicBlog';
   private $blogLabel = 'Blog';
