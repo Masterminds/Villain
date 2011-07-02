@@ -25,6 +25,7 @@ namespace Villain\CLI;
  *   ),
  * );
  * @endcode
+ * @deprecated Migrated to Fortissimo.
  * @author Matt Butcher
  */
 class ReadLine extends \BaseFortissimoCommand {

@@ -3,6 +3,8 @@
  *
  * This file contains commands for parsing options from ARGV or another source.
  *
+ * IMPORTANT: This class was backported to Fortissimo, and will be removed in the future.
+ *
  * Created by Matt Butcher on 2011-06-18.
  */
 namespace Villain\CLI;
@@ -100,6 +102,8 @@ namespace Villain\CLI;
  * );
  * @endcode
  *
+ *
+ * @deprecated Migrated to Fortissimo.
  * @author Matt Butcher
  */
 class ParseOptions extends \BaseFortissimoCommand {
