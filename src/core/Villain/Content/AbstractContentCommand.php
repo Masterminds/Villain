@@ -64,6 +64,7 @@ abstract class AbstractContentCommand extends \BaseFortissimoCommand {
     $e = new \stdClass();
     $e->context = $this->context;
     $e->commandName = $this->name;
+    return $e;
   }
 
 }
