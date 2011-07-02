@@ -7,6 +7,7 @@
  */
 
 namespace BasicBlog\Content;
+use \Villain\Storage\StorableObject;
 
 /**
  * Prepare blog content for saving.
@@ -90,25 +91,12 @@ class CreateBlog extends \BaseFortissimoCommand {
   }
 
   public function doCommand() {
-    // No real munging happens, so we might as well return just the validated data.
-    return $this->parameters;
     
-    /*
-    $data = array(
-      'descriptionFilter' => $this->param('descriptionFilter'),
-      'title' => $this->param('title'),
-      'subtitle' => $this->param('subtitle'),
-      'description' => $this->param('description'),
-      'footer' => $this->param('footer'),
-      'entriesPerPage' => $this->param('entriesPerPage'),
-      'showFullArticle' => $this->param('showFullArticle'),
-      'createdOn' => $this->param('createdOn'),
-      'createdBy' => $this->param('createdBy'),
-      'updatedOn' => $this->param('updatedOn'),
-    );
+    // Make sure this is cast into integer.
+    $this->parameters['entriesPerPage'] = (int)$this->parameters['entriesPerPage'];
     
-    return $data;
-    */
+    $so = StorableObject::newFromArray($this->parameters);
+    return $so;
   }
 }
 
