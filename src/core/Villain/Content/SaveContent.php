@@ -7,6 +7,7 @@
  */
 
 namespace Villain\Content;
+use \Villain\Storage\Storable;
 
 /**
  * Save content.
@@ -98,10 +99,6 @@ class SaveContent extends AbstractContentCommand {
       // XXX: Should this throw an exception?
       return FALSE;
     }
-    
-    // Reset the Storable. This has the advantage of retaining all of
-    // the characteristics of the Storable.
-    $s->fromArray($e);
     
     // Set it to exactly the thing saved. Note that save() will set
     // an _id attribute.
