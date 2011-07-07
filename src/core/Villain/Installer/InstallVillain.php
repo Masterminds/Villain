@@ -5,7 +5,7 @@
  *
  * Created by Matt Butcher on 2011-06-29.
  */
-namespace Villain;
+namespace Villain\Installer;
 /**
  * A Fortissimo command.
  *
