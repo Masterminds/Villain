@@ -42,10 +42,13 @@ Config::request('install')
    *   * commands.php
    * - Create database collections, indexes, etc.
    */
+  // Verify Requirements
+  ->doesCommand('requirements')
+    ->whichInvokes('\Villain\Installer\CheckRequirements')
 
   // Phase I: Get minimal information to build Villain.
   ->doesCommand('promptUser')
-    ->whichInvokes('ReadLine')
+    ->whichInvokes('\ReadLine')
     //->whichInvokes('\Villain\Installer\Questionnaire')
   ->doesCommand('reboot')
     ->whichInvokes('\Villain\Installer\RebootForInstallation')
