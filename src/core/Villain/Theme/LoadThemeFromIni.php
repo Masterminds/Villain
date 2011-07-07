@@ -59,7 +59,6 @@ class LoadThemeFromIni extends \BaseFortissimoCommand {
   }
 
   public function doCommand() {
-    
     $ini = $this->param('filename');
     
     $contents = $this->parseIni($ini);
