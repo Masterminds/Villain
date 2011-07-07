@@ -29,10 +29,24 @@ Config::group('bootstrap')
 
 // The Villain installer.
 Config::request('install')
+
+  /*
+   * - Preflight Check:
+   *   * Check for Mongo
+   *   * Check for existing files
+   * - Get info
+   *   * Database location
+   *   * Other config stuff
+   * - Generate files
+   *   * INI file?
+   *   * commands.php
+   * - Create database collections, indexes, etc.
+   */
+
   // Phase I: Get minimal information to build Villain.
   ->doesCommand('promptUser')
-    ->whichInvokes('')
-    ->whichInvokes('\Villain\Installer\Questionnaire')
+    ->whichInvokes('ReadLine')
+    //->whichInvokes('\Villain\Installer\Questionnaire')
   ->doesCommand('reboot')
     ->whichInvokes('\Villain\Installer\RebootForInstallation')
 
