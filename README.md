@@ -6,7 +6,7 @@ Villain is a PHP Content Management Framework (CMF) developed to be feature rich
 
 To fetch and install Villain, do the following:
 
-    $ git clone http://github.com/masterminds/Villain.git
+    $ git clone git://github.com/Masterminds/Villain.git
     $ cd Villain
     $ ./fort --config config/install.php install
 
