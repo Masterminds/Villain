@@ -6,18 +6,15 @@ class LoadThemeFromIniTest extends VillainTestCase {
   
   
   public function testDoCommand() {
+    $villain = new VillainTestHarness();
     
     Config::initialize();
     Config::includePath('src/core/Fortissimo/Theme');
     Config::request('foo')
       ->doesCommand('test')
       ->whichInvokes('\Villain\Theme\LoadThemeFromIni')
-      ->withParam('filename')->whoseValueIs('assets/test_theme.ini')
+      ->withParam('filename')->whoseValueIs('test/test_theme.ini')
     ;
-    
-    
-    
-    $villain = new VillainTestHarness();
     //throw new Exception(print_r(get_include_path(), TRUE) . '===' . getcwd());
     $this->assertTrue($villain->hasRequest('foo'));
     
@@ -25,7 +22,7 @@ class LoadThemeFromIniTest extends VillainTestCase {
     
     $cxt = $villain->getContext();
     
-    $this->assertTrue($cxt->has('test'));
+    $this->assertTrue($cxt->has('test'), "Check that 'test' exists.");
     $this->assertEquals('value', $cxt->get('test'));
     
   }
