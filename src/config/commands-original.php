@@ -3,12 +3,18 @@
 // Enable bundle support.
 use \Villain\Bundles\Bundle;
 
-// Since Villain uses namespaces and a namespace-aware
-// autoloader, you shouldn't have to do this very often.
-Config::includePath('core/Fortissimo/Theme'); // Include the Theme classes, which are optional.
-//Config::includePath('core/Fortissimo/CLI');
+/*
+ * Register additional paths to look for PHP code.
+ * Since we use an autoloader, this is really only 
+ * necessary for older Fortissimo classes.
+ */
+Config::includePath('core/Fortissimo/Theme');
+Config::includePath('core/Fortissimo/CLI');
 
-// Include the BasicBlog 
+/*
+ * BUNDLES
+ * Include bundles here.
+ */ 
 Bundle::load('BasicBlog');
 
 /*
@@ -197,13 +203,15 @@ Config::request('@create-blog')
 ;
 
 /*
+ * LOGGERS
+ * By default, we use a logger that injects messages into STDOUT.
  */
 Config::logger('foil')
   ->whichInvokes('FortissimoOutputInjectionLogger')
 ;
 
 /*
- * For production use this:
+ * For production use this, and comment out the FOIL logger.
  */
 /*
 Config::logger('fizzle')
@@ -212,7 +220,7 @@ Config::logger('fizzle')
 */
 
 /*
- * Caching support is built into Fortissimo.
+ * Caching support is built into Villain.
  *
  * Fortissimo has built-in support for multiple caching backends. For example, applications could
  * strategically cache some data in memcache and some in APC. Fortissimo includes a simple 
