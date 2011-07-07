@@ -1,3 +1,4 @@
 test/reports/*
 doc/api/*
 src/config/commands-update.php
+src/config/commands.php
