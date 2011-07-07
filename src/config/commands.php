@@ -136,12 +136,6 @@ Config::request('@uninstall-bundle')
 ;
 */
 
-// The Villain installer.
-Config::request('@install-villain')
-  ->usesGroup('bootstrap')
-  ->doesCommand('step1')
-  ->whichInvokes('\Villain\InstallVillain')
-;
 
 Config::request('@test')
   ->doesCommand('arguments')
