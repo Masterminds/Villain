@@ -66,6 +66,12 @@
  */
 
 /**
+ * @defgroup VillainForm Villain Forms
+ *
+ * The Villain form system.
+ */
+
+/**
  * The main Villain namespace.
  * @ingroup VillainCore
  */
