@@ -39,7 +39,7 @@ class Form extends AbstractElement {
     $this->collection = new Collection($this);
 
     // Set the action to the current url as a default.
-    $this->action = $context->getRequestMapper()->baseURL();;
+    $this->action = $context->getRequestMapper()->baseURL();
     
     $this->context = $context;
   }
