@@ -38,6 +38,8 @@ Config::group('bootstrap')
   ->doesCommand('filters')
     ->whichInvokes('\Villain\Filters\InitializeFilters')
     ->withParam('collection')->whoseValueIs('filters')
+  ->doesCommand('form')
+    ->whichInvokes('\Villain\Form\InitializeForms')
   //->doesCommand('some_command')->whichInvokes('SomeCommandClass')
   //->doesCommand('some_other_command')->whichInvokes('SomeOtherCommandClass')
 ;

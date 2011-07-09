@@ -14,6 +14,8 @@ class BuildFormTest extends VillainTestCase {
       ->doesCommand('themeInit')
         ->whichInvokes('InitializeTheme')
         ->withParam('path')->whoseValueIs('theme/vanilla')
+      ->doesCommand('form')
+        ->whichInvokes('\Villain\Form\InitializeForms')
       ->doesCommand('fooForm')
         ->whichInvokes('TestFormCommand')
     ;
@@ -28,8 +30,10 @@ class BuildFormTest extends VillainTestCase {
 
     $villain->handleRequest('foo');
 
-    // Was the form added to the context properly?
     $cxt = $villain->getContext();
+
+    $this->assertTrue($cxt->has('form'), "Check that the form system is initialized.");
+    
     $this->assertTrue($cxt->has('fooForm'), "Check that the form exists.");
   }
 }
@@ -44,7 +48,7 @@ class TestFormCommand extends \BaseFortissimoCommand {
   }
 
   public function doCommand() {
-    $form  = new Form($this->context);
+    $form = $this->context('form')->create();
     return $form;
   }
 }
