@@ -126,28 +126,48 @@ class LoadThemeFromIni extends \BaseFortissimoCommand {
  *
  * This builds an ad hoc theme package to represent the contents of an INI file.
  */
-class IniLoaderThemePackage extends \BaseThemePackage {
+class IniLoaderThemePackage extends \Villain\Theme\CoreThemePackage {
   
   protected $ini = array();
+  protected $use_core = TRUE;
   
   public function __construct(array $ini_array) {
     $this->ini = $ini_array;
+    if (isset($this->ini['settings']['use_core'])) {
+      $this->use_core = (bool)$this->ini['settings']['use_core'];
+    }
   }
   
   public function templates() {
-    return $this->extract('templates');
+    $templates = $this->extract('templates');
+    if ($this->use_core) {
+      $templates += parent::templates();
+    }
+    return $templates;
   }
   
   public function functions() {
-    return $this->extract('functions');
+    $functions = $this->extract('functions');
+    if ($this->use_core) {
+      $functions += parent::functions();
+    }
+    return $functions;
   }
   
   public function preprocessors() {
-    return $this->extract('preprocessors');
+    $preprocessors = $this->extract('preprocessors');
+    if ($this->use_core) {
+      $preprocessors += parent::preprocessors();
+    }
+    return $preprocessors;
   }
   
   public function postprocessors() {
-    return $this->extract('postprocessors');
+    $postprocessors = $this->extract('postprocessors');
+    if ($this->use_core) {
+      $postprocessors += parent::postprocessors();
+    }
+    return $postprocessors;
   }
   
   protected function extract($key) {

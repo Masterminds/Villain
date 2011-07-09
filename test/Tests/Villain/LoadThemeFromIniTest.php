@@ -54,6 +54,11 @@ class LoadThemeFromIniTest extends VillainTestCase {
     
     $this->assertEquals(4, $res);
 
+    // Test a core theme callback.
+    $this->assertTrue(\Theme::isRegistered('form.textfield'), 'Check that core theme callback is registered.');
+    //$element = new \Villain\Form\Textfield();
+    //$textfield = \Theme::render('form.textfield', $element);
+
     
   }
   
