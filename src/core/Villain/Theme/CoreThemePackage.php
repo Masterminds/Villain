@@ -16,6 +16,7 @@ class CoreThemePackage extends \BaseThemePackage {
   public function templates() {
     return array(
       //'target' => 'path/to/template.tpl.php',
+      'html' => __DIR__ . '/templates/html.tpl.php',
     );
   }
   
