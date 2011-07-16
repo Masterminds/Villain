@@ -23,6 +23,9 @@ class CoreThemePackage extends \BaseThemePackage {
   public function functions() {
     return array(
       //'target' => callback,
+      // General theme functions.
+      'attributes' => array('Villain\Theme\Functions', 'renderAttributes'),
+      // Form theming.
       'form.textfield' => array('Villain\Theme\Form', 'textfield'),
     );
   }

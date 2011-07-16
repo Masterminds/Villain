@@ -128,7 +128,7 @@ abstract class AbstractElement {
     // Should the label be run through a translation system?
     $output = '';
     if (!is_null($this->label)) {
-      $output = '<label' . $this->renderAttributes($this->buildLabelAttributes()) . '>' . $this->label . "</label>\n";
+      $output = '<label' . \Theme::render('attributes', $this->buildLabelAttributes()) . '>' . $this->label . "</label>\n";
     }
     return $output;
   }
@@ -286,7 +286,7 @@ abstract class AbstractElement {
    * different parts and combines them into one array.
    *
    * @return array
-   *   An attributes array which can be rendered to html with renderAttributes().
+   *   An attributes array which can be rendered to html with \Theme::render('attributes', $attributes).
    */
   protected function buildAttributes() {
 
@@ -324,7 +324,7 @@ abstract class AbstractElement {
    * Build the label attributes.
    *
    * @return array
-   *   An attributes array which can be rendered to html with renderAttributes().
+   *   An attributes array which can be rendered to html with \Theme::render('attributes', $attributes).
    */
   protected function buildLabelAttributes() {
     $attributes = array();
@@ -340,24 +340,6 @@ abstract class AbstractElement {
     $attributes += $this->attributes;
 
     return $attributes;
-  }
-
-  /**
-   * Render an attributes array into html element attributes.
-   *
-   * @param array $attributes
-   *   An array of attributes to convert to html attributes.
-   *
-   * @return string
-   *   The array of attributes as a string for use in a html element.
-   */
-  protected function renderAttributes(array $attributes) {
-    foreach ($attributes as $attribute => &$data) {
-      $data = isset($data) ? implode(' ', (array) $data) : null;
-      $data = $attribute . (isset($data) ? '="' . $data . '"' : '');
-    }
-
-    return $attributes ? ' ' . implode(' ', $attributes) : '';
   }
 
   /**

@@ -106,7 +106,7 @@ class Form extends AbstractElement {
    * Render the form.
    */
   public function __toString() {
-    $output = '<form' . $this->renderAttributes($this->buildAttributes()) . ">\n";
+    $output = '<form' . \Theme::render('attributes', $this->buildAttributes()) . ">\n";
     $output .= $this->collection;
     $output .= "</form>\n";
     return $output;
