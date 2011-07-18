@@ -14,7 +14,38 @@
 namespace Villain\Util;
 
 /**
- * Execute a command for the purpose of unit testing.
+ * Execute a command.
+ *
+ * The command runner executes a command in isolation from the rest of the
+ * system. It is intended to be used for automated testing (like unit testing)
+ * as a way of verifying that a command in isolation is behaving as expected.
+ *
+ * Best practices dictate that normal execution of commands should be done
+ * within the traditional Fortissimo chain-of-command structure. This provides
+ * the maximum level of transparency.
+ *
+ * Example usage:
+ * @code
+ * <?php
+ * use Villain\Util\CommandRunner;
+ * class TestCommandRunner extends PHPUnit_Framework_TestCase {
+ *
+ *   public function testRun() {
+ *     // Create a new command runner.
+ *     $runner = new CommandRunner();
+ *
+ *     // Execute a particular command, passing in the param name: HELLO.
+ *     $ret = $runner->run('StubCommand', array('name' => 'HELLO'));
+ *
+ *     // Check to see if the value was returned (assumes StubCommand extends BaseFortissimoCommand).
+ *     $this->assertEquals('HELLO', $ret, 'Check return value of a base command.');
+ *
+ *     // Check to make sure that the key is in the context, too.
+ *     $this->assertEquals('HELLO', $runner->context()->get($runner->commandName), 'Verify that context was set.');
+ *   }
+ * }
+ * ?>
+ * @endcode
  */
 class CommandRunner {
   /**
