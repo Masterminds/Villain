@@ -4,13 +4,19 @@
  * The command runner provides a simple way to execute one or more commands in
  * isolation of the rest of Fortissimo.
  *
+ * This is intended to be a tool used for unit testing, not a general-purpose
+ * command execution framework. Best practices dictate that commands that are
+ * part of a request should be executed by Fortissimo.
+ *
  * Created by Matt Butcher on 2011-07-07.
  */
+
+namespace Villain\Util;
 
 /**
  * Execute a command for the purpose of unit testing.
  */
-class VillainCommandRunner {
+class CommandRunner {
   /**
    * The name of the command. Every command has a name and a class name.
    */
@@ -87,18 +93,18 @@ class VillainCommandRunner {
    *  the context, you can use context() to retrieve the context.
    *
    */
-  public function run($commandClass, array $params = array(), $initalContext = NULL) {
+  public function run($commandClass, array $params = array(), $initialContext = NULL) {
     
     
-    $this->cxt = new FortissimoExecutionContext(
-      $intialContext, 
+    $this->cxt = new \FortissimoExecutionContext(
+      $initialContext, 
       $this->logger, 
       $this->datasource, 
       $this->cache, 
       $this->mapper
     );
     
-    set_error_handler(array('FortissimoErrorException', 'initializeFromError'), Fortissimo::ERROR_TO_EXCEPTION);
+    set_error_handler(array('\FortissimoErrorException', 'initializeFromError'), \Fortissimo::ERROR_TO_EXCEPTION);
     $cmd = new $commandClass($this->commandName, $this->commandIsCaching);
     $cmd->execute($params, $this->cxt);
     restore_error_handler();
@@ -116,7 +122,7 @@ class VillainCommandRunner {
    * @return FortissimoExecutionContext
    */
   public function context() {
-    return $cxt;
+    return $this->cxt;
   }
   
 }
