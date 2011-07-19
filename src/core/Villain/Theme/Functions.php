@@ -27,5 +27,33 @@ class Functions {
 
     return $attributes ? ' ' . implode(' ', $attributes) : '';
   }
+
+  /**
+   * A wrapper around Region Items.
+   *
+   * @param string $content
+   *   The html content for the Region Item.
+   *
+   * @return string
+   *   The html content for a Region Item with the content of this function
+   *   applied as a wrapper.
+   */
+  public static function regionItem($content) {
+    return $content;
+  }
+
+  /**
+   * A wrapper around Region.
+   *
+   * @param string $content
+   *   The html content for the Region.
+   *
+   * @return string
+   *   The html content for a Region with the content of this function
+   *   applied as a wrapper.
+   */
+  public static function regionWrapper($content) {
+    return $content;
+  }
   
 }

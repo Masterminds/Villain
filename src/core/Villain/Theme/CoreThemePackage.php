@@ -25,8 +25,13 @@ class CoreThemePackage extends \BaseThemePackage {
       //'target' => callback,
       // General theme functions.
       'attributes' => array('Villain\Theme\Functions', 'renderAttributes'),
+      
       // Form theming.
       'form.textfield' => array('Villain\Theme\Form', 'textfield'),
+
+      // Region theming.
+      'region.item' => array('Villain\Theme\Functions', 'regionItem'),
+      'region.wrapper' => array('Villain\Theme\Functions', 'regionWrapper'),
     );
   }
   

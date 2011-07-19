@@ -48,6 +48,8 @@ Config::group('renderHTML')
   ->doesCommand('theme_init')
     ->whichInvokes('InitializeTheme')
     ->withParam('path')->from('cxt:site.theme')->whoseValueIs('theme/vanilla')
+  ->doesCommand('regions')
+    ->whichInvokes('\Villain\Regions\InitializeRegions')
 ;
 
 /*
