@@ -50,7 +50,7 @@ class AddJsonToContext extends \BaseFortissimoCommand {
     
     $raw_data = $this->param('data');
     
-    $json = json_decode($raw_data);
+    $json = json_decode($raw_data, TRUE);
     
     $e = new \stdClass();
     $e->context = $this->context;
