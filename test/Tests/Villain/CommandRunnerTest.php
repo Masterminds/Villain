@@ -5,14 +5,14 @@
  *
  * Created by Matt Butcher on 2011-07-18.
  */
-require 'src/Fortissimo.php';
+require_once 'src/Fortissimo.php';
 use Villain\Util\CommandRunner;
 /**
  * A Fortissimo command.
  *
  * @author Matt Butcher
  */
-class TestCommandRunner extends PHPUnit_Framework_TestCase {
+class CommandRunnerTest extends PHPUnit_Framework_TestCase {
 
   public function testRun() {
     $runner = new CommandRunner();

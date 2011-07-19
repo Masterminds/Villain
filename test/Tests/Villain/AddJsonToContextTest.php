@@ -9,7 +9,7 @@ require 'VillainTestCase.php';
 /**
  * Defines TestAddJsonToContext.
  */
-class TestAddJsonToContext extends VillainTestCase {
+class AddJsonToContextTest extends VillainTestCase {
   
   public function testDoCommand() {
     $runner = new \Villain\Util\CommandRunner();
