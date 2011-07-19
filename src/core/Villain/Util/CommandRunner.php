@@ -56,31 +56,6 @@ class CommandRunner {
    * A boolean indicating whether the command should be using the cache.
    */
   public $commandIsCaching = FALSE;
-  /**
-   * A FortissimoLoggerManager.
-   *
-   * Unless explicitly set, it will be NULL.
-   */
-  public $logger = NULL;
-  /**
-   * A FortissimoCacheManager.
-   *
-   * Unless explicitly set, it will be NULL.
-   */
-  public $cache = NULL;
-  /**
-   * A FortissimoDatasourceManager.
-   *
-   * Unless explicitly set, it will be NULL.
-   */
-  public $datasource = NULL;
-  /**
-   * A FortissimoRequestMapper.
-   *
-   * Unless explicitly set, it will be NULL. Nothing is looked up
-   * before it is processed, but you can use this to mock a request mapper.
-   */
-  public $mapper = NULL;
   
   /**
    * The FortissimoExecutionContext for this execution of the command.
@@ -100,16 +75,20 @@ class CommandRunner {
    * Run a command and return the resulting context.
    *
    * Given a class name and the required parameters, execute a command. An optional
-   * third param allows you to pass in an intiailized context. Note, however, that the
-   * managers and mappers are NOT passed through the context. To set the managers, you should
-   * set $logger, $cache, $datasource, and $mapper directly.
+   * third param allows you to pass in an intiailized context.
    *
-   * Note that if you want to test caching, you should set $commandIsCaching to TRUE.
+   * IMPORTANT: If your command needs access to a datasource, logger, cache, or 
+   * request mapper, you MUST pass in a FortissimoExecutionContext with those 
+   * facilities set.
+   *
+   * Note that if you want to test caching, you should set $commandIsCaching to TRUE and also
+   * pass in a FortissimoExecutionContext.
    *
    * The name of the command that is being executed is set to $commandName.
    *
-   * The run() method may be called multiple times. Each time, a new context will be created
-   * using the initial context.
+   * The run() method may be called multiple times. The context is not preserved across calls
+   * (unless you pass in the same FortissimoExecutionContext as the third param, in which case
+   * your external reference will keep the context preserved).
    *
    * @param string $commandClass
    *  The name of the class that should be instantiated and executed.
@@ -117,7 +96,7 @@ class CommandRunner {
    *  An associative array of parameters to pass into the command at execution time.
    * @param mixed $initialContext
    *  The initial context. This can be either a FortissimoExecutionContext or an associative
-   *  array. Managers and mappers are not retrieved from this context, and must be explicitly set.
+   *  array. If it is 
    * @return mixed
    *  The value that this command inserted into the context (assuming it does so in the style of
    *  a BaseFortissimoCommand) or NULL. If your command does something more sophisticated with 
@@ -126,20 +105,30 @@ class CommandRunner {
    */
   public function run($commandClass, array $params = array(), $initialContext = array()) {
     
+    if (empty($initialContext)) {
+      // New empty context.
+      $this->cxt = new \FortissimoExecutionContext(array(), NULL, NULL, NULL, NULL);
+    }
+    elseif(is_array($initialContext)) {
+      // New context seeded with the array contents.
+      $this->cxt = new \FortissimoExecutionContext($initialContext, NULL, NULL, NULL, NULL);
+    }
+    else {
+      // Existing context.
+      $this->cxt = $initialContext;
+    }
     
-    $this->cxt = new \FortissimoExecutionContext(
-      $initialContext, 
-      $this->logger, 
-      $this->datasource, 
-      $this->cache, 
-      $this->mapper
-    );
-    
+    // To match Fortissimo's behavior, we convert errors to exceptions.
     set_error_handler(array('\FortissimoErrorException', 'initializeFromError'), \Fortissimo::ERROR_TO_EXCEPTION);
+    
+    // Build and execute the command just like Fortissimo does.
     $cmd = new $commandClass($this->commandName, $this->commandIsCaching);
     $cmd->execute($params, $this->cxt);
+    
     restore_error_handler();
     
+    // A BaseFortissimoCommand puts its return value in the context, with the command 
+    // name as the key. This is what we want to return.
     $result = $this->cxt->get($this->commandName);
     
     return $result;
