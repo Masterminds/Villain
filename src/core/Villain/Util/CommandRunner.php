@@ -124,7 +124,7 @@ class CommandRunner {
    *  the context, you can use context() to retrieve the context.
    *
    */
-  public function run($commandClass, array $params = array(), $initialContext = NULL) {
+  public function run($commandClass, array $params = array(), $initialContext = array()) {
     
     
     $this->cxt = new \FortissimoExecutionContext(
