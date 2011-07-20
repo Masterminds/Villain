@@ -16,6 +16,9 @@ Config::includePath('core/Fortissimo/CLI');
 // Log straight to the client.
 Config::logger('foil')->whichInvokes('FortissimoOutputInjectionLogger');
 
+// KISS
+//Config::logger('soil')->whichInvokes('SimpleOutputInjectionLogger');
+
 Config::group('bootstrap')
   ->doesCommand('config')->whichInvokes('\Villain\Configuration\AddIniToContext')
     ->withParam('filename')->whoseValueIs('config/villain.ini')
@@ -33,7 +36,34 @@ Config::request('install')
   // Verify Requirements
   ->doesCommand('requirements')
     ->whichInvokes('\Villain\Installer\CheckRequirements')
-  
+  ->doesCommand('promptUser')
+    ->whichInvokes('\ReadLine')
+    ->withParam('prompts')
+    ->whoseValueIs(array(
+      'MongDB_Server' => array(
+        'help' => 'The URL of your MongoDB (mongodb://localhost:27017)',
+        'default' => 'mongodb://localhost:27017',
+      ),
+      'MongDB_Database' => array(
+        'help' => 'The default database name (villain)',
+        'default' => 'villain',
+      ),
+      'MongDB_User' => array(
+        'help' => 'Username to authenticate to MongoDB (leave empty if none)',
+        'default' => '',
+      ),
+      'MongDB_Password' => array(
+        'help' => 'The password for authenticating to MongoDB (leave empty if none)',
+        'default' => '',
+      ),
+    )
+  )
+  ->doesCommand('testConnection')
+    ->whichInvokes('\Villain\Installer\CheckMongoConnection')
+    ->withParam('server')->from('cxt:MongoDB_Server')
+    ->withParam('username')->from('cxt:MongoDB_User')
+    ->withParam('password')->from('cxt:MongoDB_Password')
+    ->withParam('database')->from('cxt:MongoDB_Database')
   // Install the commands.php
   ->doesCommand('commands')
     ->whichInvokes('\Villain\Installer\InstallCommandsPHP')
@@ -50,9 +80,7 @@ Config::request('install')
   
 
   // Phase I: Get minimal information to build Villain.
-  ->doesCommand('promptUser')
-    ->whichInvokes('\ReadLine')
-    //->whichInvokes('\Villain\Installer\Questionnaire')
+
   ->doesCommand('reboot')
     ->whichInvokes('\Villain\Installer\RebootForInstallation')
 
