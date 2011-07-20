@@ -23,7 +23,7 @@ class RunExternalPHPUnit extends \BaseFortissimoCommand {
       ->whichHasDefault('phpunit')
       
       ->usesParam('options', 'A string or an array of commandline options to be passed to phpunit')
-      ->whichHasDefault('--colors')
+      ->whichHasDefault('--colors --verbose')
       
       ->usesParam('basedir', 'The root directory of Villain.')
       ->whichHasDefault('..') // Since this is run in src/, we go up one directory.
