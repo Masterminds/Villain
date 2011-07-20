@@ -27,11 +27,11 @@ class CheckRequirements extends \BaseFortissimoCommand {
   public function doCommand() {
     
     if (!class_exists('\MongoDB')) {
-      throw new \Villain\Exception('MongoDB Extension is not installed.');
+      throw new \Villain\InterruptException('MongoDB Extension is not installed.');
     }
     
     if (file_exists('config/commands.php')) {
-      throw new \Villain\Exception('Villain appears to already be installed. commands.php exists.');
+      throw new \Villain\InterruptException('Villain appears to already be installed. commands.php exists.');
     }
     
     return TRUE;
