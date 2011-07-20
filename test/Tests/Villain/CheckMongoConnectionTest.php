@@ -17,7 +17,13 @@ class CheckMongoConnectionTest  extends PHPUnit_Framework_TestCase {
   const REAL_MONGOS = 'mongodb://fakehost,localhost';
   
   public function setUp() {
-    
+    // We need to see (for real) if we can connect to the real
+    // database. If not, we skip the test.
+    try {
+      $db = new Mongo(self::REAL_MONGO);
+    } catch (Exception $e) {
+      $this->markTestSkipped('No MongoDB found for testing.');
+    }
   }
   
   public function testDoCommand() {
