@@ -40,7 +40,7 @@ class ListMemberField extends Field {
       }
     }
     
-    if (!$found)) {
+    if (!$found) {
       throw new FieldValidationException(sprintf('The given value %s was not in the list of acceptable values.', $value));
     }
     

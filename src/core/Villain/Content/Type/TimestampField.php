@@ -6,7 +6,7 @@
  * Created by Matt Butcher on 2011-04-28.
  */
  
-namespace Villain\Content\Type
+namespace Villain\Content\Type;
 
 /**
  * Defines TimestampField.
@@ -62,11 +62,11 @@ class TimestampField extends IntegerField {
     }
     
     if (!is_null($this->minTime) && $time < $this->minTime) {
-      throw new FieldValidationException(sprintf('Given time %d is lower than the field allows (%d)', $time, $this->minTime))
+      throw new FieldValidationException(sprintf('Given time %d is lower than the field allows (%d)', $time, $this->minTime));
     }
     
     if (!is_null($this->maxTime) && $time > $this->maxTime) {
-      throw new FieldValidationException(sprintf('Given time %d is higher than the field allows (%d)', $time, $this->maxTime))
+      throw new FieldValidationException(sprintf('Given time %d is higher than the field allows (%d)', $time, $this->maxTime));
     }
     
     return TRUE;

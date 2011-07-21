@@ -9,7 +9,7 @@ namespace Villain\Filters;
 /**
  * A filter that does nothing but return the value unaltered.
  */
-class NullFilter implments Filter {
+class NullFilter implements Filter {
   public function __construct($args = NULL) {}
   public function run($value) {return $value;}
 }
