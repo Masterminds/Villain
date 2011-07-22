@@ -49,7 +49,7 @@ class Region implements \Countable, \Iterator {
    */
   public function __toString() {
     // Sort the RegionItems by weight.
-    uasort($this->items, array($this, 'sortItems');
+    uasort($this->items, array($this, 'sortItems'));
 
     // Itterate over the items to produce the content.
     $content = '';
