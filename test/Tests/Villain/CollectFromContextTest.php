@@ -27,7 +27,7 @@ class CollectFromContextTest extends PHPUnit_Framework_TestCase {
     );
     
     $runner = new CommandRunner();
-    $result = $runner->run('CollectFromContext', $params, $cxt);
+    $result = $runner->run('\Villain\Util\CollectFromContext', $params, $cxt);
     
     $this->assertTrue(is_array($result));
     $this->assertEquals(2, count($result));
