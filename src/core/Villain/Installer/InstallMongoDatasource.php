@@ -79,9 +79,9 @@ class InstallMongoDatasource extends \Villain\FU\ModifyFileInPlace {
   }
   
   /**
-   * Generate a Config::usesParam() function as a string.
+   * Generate a Config::withParam() function as a string.
    * 
-   * This creates Config::usesParam()->whoseValueIs().The code is returned
+   * This creates Config::withParam()->whoseValueIs().The code is returned
    * as a string. Minimal escaping is done of $param and $value, both of 
    * which are assumed to be strings.
    * 
@@ -89,7 +89,7 @@ class InstallMongoDatasource extends \Villain\FU\ModifyFileInPlace {
    * @param string $value
    */
   protected function generateUsesParam($param, $value) {
-    $template = PHP_EOL . '  ->usesParam(\'%s\')->whoseValueIs(\'%s\')';
+    $template = PHP_EOL . '  ->withParam(\'%s\')->whoseValueIs(\'%s\')';
     $param = addslashes($param);
     $value = addslashes($value);
     return sprintf($template, $param, $value);
