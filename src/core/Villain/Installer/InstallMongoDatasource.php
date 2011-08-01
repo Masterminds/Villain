@@ -10,6 +10,8 @@ namespace Villain\Installer;
  * This installs MongoDB connect information into a commands.php file. It is
  * intended only for use by an installer, and it installs a default datasource.
  */
+use Villain\Util\String;
+
 class InstallMongoDatasource extends \Villain\FU\ModifyFileInPlace {
 
   // See BaseFortissimoCommand::expects().
@@ -40,9 +42,16 @@ class InstallMongoDatasource extends \Villain\FU\ModifyFileInPlace {
     $this->configString = $this->buildDBConfig($server, $db, $user, $password);
     
     $this->iterateFile($file);
-    
   }
   
+  /**
+   * Replace a placeholder with a datasource declaration.
+   * 
+   * @param string $line
+   *   The line to scan.
+   * @return string
+   *   The resulting configuration directive.
+   */
   protected function forEachLineInFile($line) {
     return preg_replace('//== MongoDB Config', $this->configString, $line);
   }
