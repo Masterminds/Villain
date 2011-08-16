@@ -30,7 +30,7 @@ class RebootForInstallation extends \BaseFortissimoCommand {
       throw new \Villain\InterruptException('Configuration file not found.');
     }
     
-    Config::initialize(array());
+    \Config::initialize(array());
     require $config;
 
     // $myParam = $this->param('myParam', 'Default value');
