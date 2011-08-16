@@ -52,6 +52,18 @@ abstract class ModifyFileInPlace extends \BaseFortissimoCommand {
       throw new \Villain\InterruptException(sprintf('File %s is not writable', $file));
     }
     
+    
+    // Testing a different method of writing files.
+    $lines = file($file);
+    $fp = fopen($file, 'w+');
+    foreach ($lines as $line) {
+      $new_line = $this->forEachLineInFile($line);
+      fwrite($fp, $new_line);
+    }
+    fclose($fp);
+    
+    
+    /*
     // Open and lock.
     $fp = fopen($file, 'rw');
     flock($fp, LOCK_EX);
@@ -71,6 +83,7 @@ abstract class ModifyFileInPlace extends \BaseFortissimoCommand {
     // Unlock and close.
     flock($fp, LOCK_UN);
     fclose($fp);
+    */
   }
   
   /**
