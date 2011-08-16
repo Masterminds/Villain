@@ -77,9 +77,11 @@ Config::request('install')
   // Add the Mongo DB config to the new commands file.
   ->doesCommand('configureDatasource')
     ->whichInvokes('\Villain\Installer\InstallMongoDatasource')
-    ->withParam('file')->whoseValueIs('config/commands.php')
-    ->withParam('pattern')->whoseValueIs()
-    ->withParam('replacement')->whoseValueIs()
+    ->withParam('commandsFile')->whoseValueIs('config/commands.php')
+    ->withParam('server')->from('cxt:MongoDB_Server')
+    ->withParam('username')->from('cxt:MongoDB_User')
+    ->withParam('password')->from('cxt:MongoDB_Password')
+    ->withParam('database')->from('cxt:MongoDB_Database')
     
   /*
    * - Get info
