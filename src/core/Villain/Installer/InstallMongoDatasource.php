@@ -53,7 +53,7 @@ class InstallMongoDatasource extends \Villain\FU\ModifyFileInPlace {
    *   The resulting configuration directive.
    */
   protected function forEachLineInFile($line) {
-    return preg_replace('//== MongoDB Config', $this->configString, $line);
+    return preg_replace('|//== MongoDB Config|', $this->configString, $line);
   }
   
   /**
