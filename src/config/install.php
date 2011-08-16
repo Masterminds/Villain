@@ -63,12 +63,6 @@ Config::request('install')
     ->withParam('username')->from('cxt:MongoDB_User')
     ->withParam('password')->from('cxt:MongoDB_Password')
     ->withParam('database')->from('cxt:MongoDB_Database')
-  ->doesCommand('installDB')
-    ->whichInvokes('\Villain\Installer\InstallMongoDatasource')
-    ->withParam('server')->from('cxt:MongoDB_Server')
-    ->withParam('username')->from('cxt:MongoDB_User')
-    ->withParam('password')->from('cxt:MongoDB_Password')
-    ->withParam('database')->from('cxt:MongoDB_Database')
     
   // Install the commands.php
   ->doesCommand('commands')
