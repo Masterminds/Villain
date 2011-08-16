@@ -39,19 +39,19 @@ Config::request('install')
     ->whichInvokes('\ReadLine')
     ->withParam('prompts')
     ->whoseValueIs(array(
-      'MongDB_Server' => array(
+      'MongoDB_Server' => array(
         'help' => 'The URL of your MongoDB (mongodb://localhost:27017)',
         'default' => 'mongodb://localhost:27017',
       ),
-      'MongDB_Database' => array(
+      'MongoDB_Database' => array(
         'help' => 'The default database name (villain)',
         'default' => 'villain',
       ),
-      'MongDB_User' => array(
+      'MongoDB_User' => array(
         'help' => 'Username to authenticate to MongoDB (leave empty if none)',
         'default' => '',
       ),
-      'MongDB_Password' => array(
+      'MongoDB_Password' => array(
         'help' => 'The password for authenticating to MongoDB (leave empty if none)',
         'default' => '',
       ),
