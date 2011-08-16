@@ -29,7 +29,6 @@ Config::group('bootstrap')
   //->doesCommand('some_other_command')->whichInvokes('SomeOtherCommandClass')
 ;
 
-
 // The Villain installer.
 Config::request('install')
 
@@ -64,9 +63,23 @@ Config::request('install')
     ->withParam('username')->from('cxt:MongoDB_User')
     ->withParam('password')->from('cxt:MongoDB_Password')
     ->withParam('database')->from('cxt:MongoDB_Database')
+  ->doesCommand('installDB')
+    ->whichInvoles('\Villain\Installer\InstallMongoDatasource')
+    ->withParam('server')->from('cxt:MongoDB_Server')
+    ->withParam('username')->from('cxt:MongoDB_User')
+    ->withParam('password')->from('cxt:MongoDB_Password')
+    ->withParam('database')->from('cxt:MongoDB_Database')
+    
   // Install the commands.php
   ->doesCommand('commands')
     ->whichInvokes('\Villain\Installer\InstallCommandsPHP')
+
+  // Add the Mongo DB config to the new commands file.
+  ->doesCommand('configureDatasource')
+    ->whichInvokes('\Villain\Installer\InstallMongoDatasource')
+    ->withParam('file')->whoseValueIs('config/commands.php')
+    ->withParam('pattern')->whoseValueIs()
+    ->withParam('replacement')->whoseValueIs()
     
   /*
    * - Get info
@@ -78,7 +91,7 @@ Config::request('install')
    * - Create database collections, indexes, etc.
    */
   
-
+/*
   // Phase I: Get minimal information to build Villain.
 
   ->doesCommand('reboot')
@@ -88,4 +101,5 @@ Config::request('install')
   ->usesGroup('bootstrap')
   ->doesCommand('step1')
     ->whichInvokes('\Villain\Installer\InstallVillain')
+*/
 ;
