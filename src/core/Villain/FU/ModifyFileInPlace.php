@@ -81,5 +81,5 @@ abstract class ModifyFileInPlace extends \BaseFortissimoCommand {
    * @return string
    *   The modified line of the file.
    */
-  abstract function forEachLineInFile($line);
+  abstract protected function forEachLineInFile($line);
 }
