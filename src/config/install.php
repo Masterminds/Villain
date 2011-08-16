@@ -77,25 +77,13 @@ Config::request('install')
     ->withParam('password')->from('cxt:MongoDB_Password')
     ->withParam('database')->from('cxt:MongoDB_Database')
     
-  /*
-   * - Get info
-   *   * Database location
-   *   * Other config stuff
-   * - Generate files
-   *   * INI file?
-   *   * commands.php
-   * - Create database collections, indexes, etc.
-   */
-  
-/*
-  // Phase I: Get minimal information to build Villain.
-
+  // Reboot with the new config file.
   ->doesCommand('reboot')
     ->whichInvokes('\Villain\Installer\RebootForInstallation')
-
-  // Phase II: Bootstrap Villain and install.
+    ->withParam('configFile')->whoseValueIs('config/commands.php')
+  
   ->usesGroup('bootstrap')
-  ->doesCommand('step1')
+  ->doesCommand('mainInstall')
     ->whichInvokes('\Villain\Installer\InstallVillain')
-*/
+
 ;
