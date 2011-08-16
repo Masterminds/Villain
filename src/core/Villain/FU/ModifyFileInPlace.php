@@ -56,10 +56,12 @@ abstract class ModifyFileInPlace extends \BaseFortissimoCommand {
     // Testing a different method of writing files.
     $lines = file($file);
     $fp = fopen($file, 'w+');
+    flock($fp, LOCK_EX);
     foreach ($lines as $line) {
       $new_line = $this->forEachLineInFile($line);
       fwrite($fp, $new_line);
     }
+    flock($fp, LOCK_UN);
     fclose($fp);
     
     
