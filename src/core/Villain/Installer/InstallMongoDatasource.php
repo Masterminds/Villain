@@ -84,6 +84,9 @@ class InstallMongoDatasource extends \Villain\FU\ModifyFileInPlace {
     $conf .= $this->generateUsesParam('defaultDB', $db);
     $conf .= $this->generateUsesParam('isDefault', 'true');
     
+    
+    $conf .= ";";
+    
     return $conf;
   }
   
