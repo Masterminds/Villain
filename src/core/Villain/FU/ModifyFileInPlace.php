@@ -64,7 +64,7 @@ abstract class ModifyFileInPlace extends \BaseFortissimoCommand {
     
     // Now we write.
     rewind($fp);
-    ftruncate($fp);
+    ftruncate($fp, 0);
     // Need to see if this outperforms just looping and writing.
     fwrite($fp, implode('', $buffer));
     
