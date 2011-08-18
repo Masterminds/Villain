@@ -16,8 +16,12 @@ Config::includePath('core/Fortissimo/CLI');
 // Log straight to the client.
 Config::logger('foil')->whichInvokes('FortissimoOutputInjectionLogger');
 
-// KISS
-//Config::logger('soil')->whichInvokes('SimpleOutputInjectionLogger');
+// Part way through the install, we'll load up the MongoDB. For now,
+// we need a proxy:
+Config::datasource('db')
+  ->whichInvokes('\Villain\Util\ProxyDatasource')
+  ->withParam('isDefault')->whoseValueIs(TRUE)
+;
 
 Config::group('bootstrap')
   ->doesCommand('config')->whichInvokes('\Villain\Configuration\AddIniToContext')
