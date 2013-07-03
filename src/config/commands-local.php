@@ -20,7 +20,13 @@ Bundle::load('BasicBlog');
 /*
  * The main storage backend for Villain.
  */
-//== MongoDB Config
+Config::datasource('db') // Name of datasource
+  ->whichInvokes('FortissimoMongoDatasource') // The class it uses
+  ->withParam('server')->whoseValueIs('mongodb://localhost:27017')
+  ->withParam('defaultDB')->whoseValueIs('villain')
+  ->withParam('isDefault')->whoseValueIs(TRUE) // Only datasource one can be default.
+;
+
 
 /*
  * Bootstrap.
