@@ -7,7 +7,7 @@
  */
 namespace Villain\Installer;
 /**
- * A Fortissimo command.
+ * Do any necessary configuration to restart areas of the installer.
  *
  * @author Matt Butcher
  */
@@ -16,28 +16,42 @@ class RebootForInstallation extends \BaseFortissimoCommand {
   public function expects() {
     return $this
       ->description('Rebuild the Config object.')
-      ->usesParam('configFile', 'The configuration file to load.')
-      ->whichIsRequired()
+      ->usesParam('server', 'The server URI, as defined in the MongoDB documentation.')
+        ->whichHasDefault('mongodb://localhost:27017')
+      ->usesParam('user', 'The username of the MongoDB user. Optional.')
+      ->usesParam('password', 'The password of the MongoDB user. Optional.')
+      ->usesParam('database', 'The database Villain will use.')
+        ->withFilter('string')
+        ->whichHasDefault('villain')
+       ->usesParam('proxyDatasourceName')->whichHasDefault('db')
       ->andReturns('Nothing. However, the system is re-bootstrapped with new commands.')
     ;
   }
 
   public function doCommand() {
     
-    $config = $this->param('configFile');
+    $ds_params = array(
+      'defaultDB' => $this->param('database'),
+      'server'    => $this->param('server'),
+      'username'  => $this->param('user'),
+      'password'  => $this->param('password'),
+    );
     
-    if (!is_readable($config)) {
-      throw new \Villain\InterruptException('Configuration file not found.');
+    $dsn = $this->param('proxyDatasourceName');
+    
+    $ds = $this->context->ds($dsn);
+    
+    if ($ds instanceof \Villain\Util\ProxyDatasource) {
+      $mongo = $ds->createDatasource('\FortissimoMongoDatsource', $ds_params);
+      $ds->setInnerDatasource($mongo);
+    }
+    else {
+      throw new \Villain\Exception('No proxy datasource found.');
     }
     
-    \Config::initialize(array());
-    require $config;
-
-    // $myParam = $this->param('myParam', 'Default value');
-    // $myCxt = $this->context('myContext', 'Default value');
-
-
-    // return $result; // Insert into Context.
+    // This will throw an exception if it fails.
+    $ds->get()->listCollections();
+    
   }
 }
 
